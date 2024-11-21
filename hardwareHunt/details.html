@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1e;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #2c2c2e;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5em 2em;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            color: #ffaa33;
+        }
+
+        .logo {
+            width: 40px;
+            height: auto;
+            margin-right: 0.5em;
+        }
+
+        .header-left h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .header-center {
+            display: flex;
+            gap: 1.5em;
+            align-items: center;
+        }
+
+        .header-center a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1em;
+        }
+
+        .header-center a:hover {
+            text-decoration: underline;
+        }
+
+        .header-right {
+            display: block;
+            align-items: right;
+            text-align: right;
+            gap: 1em;
+            width: 200px;
+        }
+
+        .user-icon {
+            width: 30px;
+            height: auto;
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .container {
+            width: 75%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        .product-details {
+            display: flex;
+            gap: 20px;
+        }
+
+        .product-image {
+            width: 40%;
+            border-radius: 8px;
+            margin-right: 30px;
+        }
+
+        .product-info {
+            width: 60%;
+        }
+
+        .product-name {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .price {
+            font-size: 1.5em;
+            color: #ffaa33;
+            margin-bottom: 10px;
+        }
+
+        .stock-status {
+            color: #ff4d4d;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .cart-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-to-cart-btn {
+            background-color: #ffaa33;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .quantity-input {
+            padding: 10px;
+            width: 50px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #000;
+            text-align: center;
+        }
+
+        .divider {
+            border-top: 1px solid #555;
+            margin: 20px 0;
+        }
+
+        .details-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 20px;
+        }
+
+        .details-table div {
+            padding: 5px 0;
+        }
+
+        .details-table .heading {
+            color: #888;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .product-details {
+                flex-direction: column;
+            }
+            .product-image, .product-info {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
+        <h1>Hardware Hunt</h1>
+    </div>
+    <nav class="header-center">
+        <a href="#about">About</a>
+        <a href="#components">Components</a>
+        <a href="#projects">Projects</a>
+    </nav>
+    <div class="header-right">
+        <img src="user-icon.png" alt="User Icon" class="user-icon">
+    </div>
+</header>
+
+<main class="container">
+    <div class="product-details">
+        <img src="product-image.jpg" alt="Product Image" class="product-image">
+
+        <div class="product-info">
+            <div class="product-name">Adafruit QT Py ESP32-C3 WiFi Dev Board with STEMMA QT</div>
+            <div class="product-description">Tiny beginner-friendly WiFi board for simple IoT projects - perfect for connecting sensors & controlling devices remotely.</div>
+            <div class="price">$4.95</div>
+            <div class="stock-status">Out of stock</div>
+
+            <div class="cart-section">
+                <button class="add-to-cart-btn">Add to Cart</button>
+                <input type="number" class="quantity-input" value="1" min="1">
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="details-table">
+                <div class="heading">Manufacturer</div>
+                <div>Adafruit</div>
+                
+                <div class="heading">Category</div>
+                <div>Development Boards</div>
+                
+                <div class="heading">Part Number</div>
+                <div>5405</div>
+                
+                <div class="heading">Quantity in Stock</div>
+                <div>0</div>
+                
+                <div class="heading">Data Sheet</div>
+                <div><a href="#">Download</a></div>
+                
+                <div class="heading">Video Tutorial</div>
+                <div><a href="#">Watch</a></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const addToCartButton = document.querySelector('.add-to-cart-btn');
+    const quantityInput = document.querySelector('.quantity-input');
+
+    addToCartButton.addEventListener('click', () => {
+        const quantity = quantityInput.value;
+        alert(`Added ${quantity} item(s) to cart.`);
+    });
+</script>
+
+</body>
+</html>
