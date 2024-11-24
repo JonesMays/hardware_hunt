@@ -2,7 +2,7 @@
 
 // var_dump output variables ot the screen
 // request contains all submitted form information
-var_dump($_REQUEST);
+// var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
 
@@ -27,7 +27,7 @@ if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro
     exit(); //stop running page
 } else {
-    echo "db connection success!"; //slaytastic. no errors
+    // echo "db connection success!"; //slaytastic. no errors
     //if you mess up username password serve then this error will come up.
 }
 ?>
@@ -123,14 +123,52 @@ if($mysql->connect_errno) { //if error
             margin: 0 150px;
         }
 
+        .hero-content-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            width: 100%;
+            margin-bottom: 0;
+            font-size: 0.8em;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            border-radius: 20px 20px 0 0;
+            transition: background-color 0.3s;
+        }
+
+        .tab span {
+            display: inline-block;
+            transition: transform 0.2s, color 0.3s;
+        }
+
+        .tab:hover:not(.active) span {
+            transform: scale(1.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .tab.active {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #ffaa33;
+        }
+
         .hero-content {
+            border-radius: 0 0 20px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             background-color: rgba(0, 0, 0, 0.6);
             padding: 30px;
-            border-radius: 20px;
             max-width: 900px;
             margin-right: 0px;
         }
@@ -149,13 +187,11 @@ if($mysql->connect_errno) { //if error
         }
 
         .search-box {
+            display: none;
+        }
+
+        .search-box.active {
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            background-color: #333;
-            border-radius: 15px;
-            padding: 5px;
-            width: 100%;
         }
 
         .search-input {
@@ -314,17 +350,23 @@ if($mysql->connect_errno) { //if error
 
 <main>
     <div class="hero-section">
-        <div class="hero-content">
-            <h2>Skip the hassle of disorganized hardware projects.</h2>
-            <div class="search-container">
-                <form action="component_results.php" method="get" class="search-box">
-                    <input type="text" class="search-input" placeholder="Search for parts" name="search-parts">
-                    <button type="submit" class="search-btn">Search</button>
-                </form><br><br>
-                <form action="projects_search.php" method="get" class="search-box">
-                    <input type="text" class="search-input" placeholder="Search for projects" name="search-projects">
-                    <button type="submit" class="search-btn">Search</button>
-                </form>
+        <div class="hero-content-wrapper">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('parts')"><span>Search Parts</span></div>
+                <div class="tab" onclick="switchTab('projects')"><span>Search Projects</span></div>
+            </div>
+            <div class="hero-content">
+                <h2>Skip the hassle of disorganized hardware projects.</h2>
+                <div class="search-container">
+                    <form action="component_results.php" method="get" class="search-box active" id="parts-search">
+                        <input type="text" class="search-input" placeholder="Search for parts" name="search-parts">
+                        <button type="submit" class="search-btn">Search</button>
+                    </form>
+                    <form action="projects_search.php" method="get" class="search-box" id="projects-search">
+                        <input type="text" class="search-input" placeholder="Search for projects" name="search-projects">
+                        <button type="submit" class="search-btn">Search</button>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="tagline">
@@ -370,6 +412,24 @@ if($mysql->connect_errno) { //if error
 
 
 </main>
+
+<script>
+function switchTab(type) {
+    // Update tabs
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    // Check if the clicked element is the span or the div
+    const tabElement = event.target.classList.contains('tab') ? event.target : event.target.parentElement;
+    tabElement.classList.add('active');
+    
+    // Update search boxes
+    document.querySelectorAll('.search-box').forEach(box => box.classList.remove('active'));
+    if (type === 'parts') {
+        document.getElementById('parts-search').classList.add('active');
+    } else {
+        document.getElementById('projects-search').classList.add('active');
+    }
+}
+</script>
 
 </body>
 </html>
