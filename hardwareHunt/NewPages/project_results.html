@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Results</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: #ffffff;
+            background-color: #1c1c1e;
+        }
+
+        .main-content-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 1.5em 0;
+        }
+
+        .main-content {
+            display: flex; 
+            gap: 1.5em; 
+            width: 60%;
+            max-width: 1400px;
+        }
+
+        #project-list {
+            width: 100%; 
+            padding: 1.5em;
+            background-color: #1c1c1e;
+            border-radius: 10px;
+        }
+
+        .project {
+            display: flex;
+            align-items: center;
+            background-color: #2c2c2e;
+            border-radius: 10px;
+            padding: 1em;
+            margin-bottom: 1em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .project:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .project img {
+            width: 20%;
+            height: auto;
+            border-radius: 5px;
+            margin-right: 1em;
+        }
+
+        .project-details {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project h3 {
+            font-size: 1.1em;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .project p {
+            font-size: 0.9em;
+            color: #a1a1a3;
+            margin: 0.3em 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                width: 90%;
+            }
+            #project-list {
+                width: 100%;
+            }
+            .project {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .project img {
+                margin-bottom: 1em;
+            }
+            .project-details {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <iframe src="navbar.html" style="border: none; width: 100%; height: auto;" id="navbar"></iframe>
+
+    <div class="main-content-wrapper">
+        <div class="main-content">
+            <div id="project-list">
+                <div class="project">
+                    <img src="project-image.jpg" alt="Project 1">
+                    <div class="project-details">
+                        <div class="project-info">
+                            <h3>Project 1</h3>
+                            <p>Project Description</p>
+                            <p>Category: Electronics</p>
+                            <p>Creator: User 1</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="project">
+                    <img src="project-image.jpg" alt="Project 2">
+                    <div class="project-details">
+                        <div class="project-info">
+                            <h3>Project 2</h3>
+                            <p>Project Description</p>
+                            <p>Category: Electronics</p>
+                            <p>Creator: User 2</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
