@@ -27,7 +27,7 @@ if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro
     exit(); //stop running page
 } else {
-    echo "db connection success!"; //slaytastic. no errors
+    //echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
     //if you mess up username password serve then this error will come up.
 }
 ?>
