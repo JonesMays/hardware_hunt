@@ -381,13 +381,14 @@ if($mysql->connect_errno) { //if error
 
             <?php
             // Query to fetch 5 random components from the "details" view
-            $query = "SELECT component_id, component_name, component_description, component_type, manufacturer_name, price FROM component_details ORDER BY RAND() LIMIT 5";
+            $query = "SELECT component_id, component_name, component_description, component_type, manufacturer_name, price, component_image  FROM component_details ORDER BY RAND() LIMIT 5";
             $result = $mysql->query($query);
 
             if ($result) {
                 while ($component = $result->fetch_assoc()) {
                     echo "<div class='component-card'>";
                     echo "<h3><a href='component_details.php?id=" . htmlspecialchars($component['component_id']) . "'>" . htmlspecialchars($component['component_name']) . "</a></h3>";
+                    echo "<img src='" . htmlspecialchars($component['component_image'], ENT_QUOTES, 'UTF-8') . "' alt='Product Image' class='product-image'>"; //attempting to insert component images into "featured components" but not sure if this works
                     echo "<p class='description'>" . htmlspecialchars($component['component_description']) . "</p>";
                     echo "<p>Type: " . htmlspecialchars($component['component_type']) . "</p>";
                     echo "<p>Manufacturer: " . htmlspecialchars($component['manufacturer_name']) . "</p>";
