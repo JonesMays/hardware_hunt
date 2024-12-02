@@ -21,7 +21,7 @@ $mysql = new mysqli(
     $userpw,
     $db
 );
-
+//
 // if I can find an error number then stop because there was a problem
 if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro

@@ -1,7 +1,7 @@
 <?php
 
 // var_dump output variables ot the screen
-// request contains all submitted form information
+// request contains all submitted form information//
 var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
@@ -21,7 +21,7 @@ $mysql = new mysqli(
     $userpw,
     $db
 );
-
+//
 // if I can find an error number then stop because there was a problem
 if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro

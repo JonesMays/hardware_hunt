@@ -4,7 +4,7 @@
 // request contains all submitted form information
 // var_dump($_REQUEST);
 
-// echo "<br><br>hello " . $_REQUEST["fullname"];
+// echo "<br><br>hello " . $_REQUEST["fullname"];//
 
 //step 1 connect to database
 

@@ -22,6 +22,7 @@ $mysql = new mysqli(
     $db
 );
 
+
 // if I can find an error number then stop because there was a problem
 if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro
@@ -172,6 +173,14 @@ if($mysql->connect_errno) { //if error
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
+        }
+        /*amanda added this: */
+        .add-to-cart-btn:hover {
+            background-color: #cc8800; /* Darker shade when hovered */
+        }
+        .add-to-cart-btn.added {
+            background-color: white;
+            color: #ffaa33;
         }
 
         .quantity-input {
@@ -360,11 +369,31 @@ if($mysql->connect_errno) { //if error
                 <div class="price"> $<?php echo $currentrow['price']; ?></div>
                 <div class="stock-status">Stock Quantity: <?php echo $currentrow['stock_quantity']; ?></div>
                 <div class="cart-section">
-                    <button class="add-to-cart-btn">Add to Cart</button>
-                    <input type="number" class="quantity-input" value="1" min="1">
+                    <button class="add-to-cart-btn">Add to Favorites</button>
+<!--                    <input type="number" class="quantity-input" value="1" min="1">-->
+<!--                    amanda added. -->
+                    <script>
+                        // Select the button element
+                        const button = document.querySelector(".add-to-cart-btn");
+
+                        // Add an event listener for the 'click' event
+                        button.addEventListener("click", function () {
+                            if (button.classList.contains("added")) {
+                                // If the button is in the "added" state, revert to the default
+                                button.textContent = "Add to Favorites";
+                                button.classList.remove("added");
+                            } else {
+                                // If the button is in the default state, change to "added"
+                                button.textContent = "Added to Favorites";
+                                button.classList.add("added");
+                            }
+                        });
+                    </script>
                 </div>
                 <div class="divider"></div>
                 <div class="details-table">
+                    <div class="heading">Where To Buy</div>
+                    <div><a href="<?php echo $currentrow['purchase_link']; ?>" class="link-color">Buy Here</a></div>
                     <div class="heading">Manufacturer</div>
                     <div><?php echo $currentrow['manufacturer_name']; ?></div>
                     <div class="heading">Category</div>
@@ -372,7 +401,28 @@ if($mysql->connect_errno) { //if error
                     <div class="heading">Data Sheet</div>
                     <div><a href="<?php echo $currentrow['spec_sheet_url']; ?>" class="link-color">Download</a></div>
                     <div class="heading">Video Tutorial</div>
-                    <div><a href="<?php echo $currentrow['tutorial_url']; ?>" class="link-color">Watch</a></div>
+                    <div><?php
+                        // Assuming $currentrow['tutorial_url'] contains the video URL
+                        $videoUrl = $currentrow['tutorial_url'];
+
+                        // Extract the video ID for YouTube
+                        function extractYouTubeID($url) {
+                            parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                            return $query['v'] ?? ''; // Extract the 'v' parameter, which is the video ID
+                        }
+
+                        $videoID = extractYouTubeID($videoUrl);
+
+                        // Check if the video ID is valid
+                        if (!empty($videoID)) {
+                            echo '<a href="' . htmlspecialchars($videoUrl) . '" target="_blank">';
+                            echo '<img src="https://img.youtube.com/vi/' . htmlspecialchars($videoID) . '/hqdefault.jpg" alt="Tutorial Thumbnail" style="width: 200px; height: auto;">';
+                            echo '</a>';
+                        } else {
+                            // Fallback in case the URL is not a YouTube link
+                            echo '<a href="' . htmlspecialchars($videoUrl) . '" target="_blank" class="link-color">Watch</a>';
+                        }
+                        ?></div>
                 </div>
             </div>
         <?php  }?>
@@ -441,6 +491,40 @@ if($mysql->connect_errno) { //if error
 
         <div class="reviews-section">
             <h2>User Reviews</h2>
+            <?php
+            // Step 1: grab reviews with the component id of the details page selected
+            $sql = "SELECT r.component_id, r.review_id, r.user_id, r.project_id, r.rating_value, r.review_comments, r.created_at, u.username 
+        FROM reviews r 
+        JOIN users u ON r.user_id = u.user_id 
+        WHERE r.component_id = " . intval($_REQUEST['id']); // Use JOIN to fetch username in a single query
+
+            $results = $mysql->query($sql);
+
+            if (!$results) {
+                echo "<hr>Your SQL:<br> " . $sql . "<br><br>";
+                echo "SQL Error: " . $mysql->error . "<hr>";
+                exit();
+            }
+
+            if ($results->num_rows > 0) {
+                while ($currentrow = $results->fetch_assoc()) {
+                    ?>
+                    <div class="review">
+                        <div class="review-header">
+                            <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
+                            <span class="user-name"><?php echo htmlspecialchars($currentrow['username']); ?></span> <!-- Display username -->
+                            <span class="rating"><?php echo str_repeat('★', $currentrow['rating_value']) . str_repeat('☆', 5 - $currentrow['rating_value']); ?></span>
+                        </div>
+                        <p class="review-text"><?php echo htmlspecialchars($currentrow['review_comments']); ?></p>
+<!--                        maybe fix ui so there is a date as well? amanda-->
+<!--                        <span class="review-date">--><?php //echo htmlspecialchars($currentrow['created_at']); ?><!--</span> Display date -->
+                    </div>
+                    <?php
+                }
+            } else {
+                echo "No reviews found for this component.";
+            }
+            ?>
             <!-- Placeholder review content -->
             <div class="review">
                 <div class="review-header">
