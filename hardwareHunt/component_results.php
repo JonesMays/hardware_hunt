@@ -2,7 +2,7 @@
 
 // var_dump output variables ot the screen
 // request contains all submitted form information//
-var_dump($_REQUEST);
+// var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
 
@@ -30,6 +30,29 @@ if($mysql->connect_errno) { //if error
     // echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
     //if you mess up username password serve then this error will come up.
 }
+
+// Get total number of products for pagination
+$countSql = "SELECT COUNT(*) as total FROM component_details WHERE 1=1";
+if (isset($_REQUEST['search-parts'])) {
+    $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
+    $countSql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
+}
+$countResult = $mysql->query($countSql);
+$totalProducts = $countResult->fetch_assoc()['total'];
+
+// Set pagination variables
+$productsPerPage = 10; // Adjust this number as needed
+$totalPages = ceil($totalProducts / $productsPerPage);
+$currentPage = isset($_REQUEST['page']) ? max(1, min($totalPages, intval($_REQUEST['page']))) : 1;
+$offset = ($currentPage - 1) * $productsPerPage;
+
+// Modify your existing SQL query to include LIMIT and OFFSET
+$sql = "SELECT * FROM component_details WHERE 1=1";
+if (isset($_REQUEST['search-parts'])) {
+    $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
+    $sql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
+}
+$sql .= " LIMIT $productsPerPage OFFSET $offset";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,6 +127,12 @@ if($mysql->connect_errno) { //if error
             padding: 1.5em;
             background-color: #1c1c1e;
             border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .products-container {
+            flex: 1;
         }
 
         .product {
@@ -203,6 +232,31 @@ if($mysql->connect_errno) { //if error
                 margin-top: 0.5em;
             }
         }
+
+        .pagination {
+            margin-top: 2em;
+            display: flex;
+            justify-content: center;
+            gap: 0.5em;
+            width: 100%;
+        }
+
+        .page-link {
+            padding: 0.5em 1em;
+            background-color: #2c2c2e;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .page-link:hover {
+            background-color: #3c3c3e;
+        }
+
+        .page-link.active {
+            background-color: #0a84ff;
+        }
     </style>
 </head>
 <body>
@@ -287,6 +341,14 @@ if($mysql->connect_errno) { //if error
         </aside>
 
         <main id="product-list">
+            <div class="pagination">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?php echo $i; ?><?php echo isset($_REQUEST['search-parts']) ? '&search-parts=' . urlencode($_REQUEST['search-parts']) : ''; ?>" 
+                    class="page-link <?php echo $i === $currentPage ? 'active' : ''; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                <?php endfor; ?>
+            </div>
         </main>
     </div>
 </div>
@@ -303,7 +365,7 @@ if($mysql->connect_errno) { //if error
             $sql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
         }
 
-        // echo $sql;
+        $sql .= " LIMIT $productsPerPage OFFSET $offset";
 
         $results = $mysql->query($sql);
         if (!$results) {
@@ -315,14 +377,14 @@ if($mysql->connect_errno) { //if error
         while ($currentrow = $results->fetch_assoc()) {
             // echo json_encode($currentrow, JSON_THROW_ON_ERROR);
             $one = [
-                'id' => utf8_encode($currentrow['component_id']),
-                'name' => utf8_encode($currentrow['component_name']),
+                'id' => mb_convert_encoding($currentrow['component_id'], "UTF-8", mb_detect_encoding($currentrow['component_id'])),
+                'name' => mb_convert_encoding($currentrow['component_name'], "UTF-8", mb_detect_encoding($currentrow['component_name'])),
                 'price' => (float)$currentrow['price'],
-                'imgSrc' => utf8_encode($currentrow['component_image']),
-                'description' => utf8_encode(addslashes($currentrow['component_description'])),
+                'imgSrc' => mb_convert_encoding($currentrow['component_image'], "UTF-8", mb_detect_encoding($currentrow['component_image'])),
+                'description' => mb_convert_encoding($currentrow['component_description'], "UTF-8", mb_detect_encoding($currentrow['component_description'])),
                 'stock' => (int)$currentrow['stock_quantity'],
-                'manufacturer' => utf8_encode($currentrow['manufacturer_name']),
-                'category' => utf8_encode($currentrow['component_type'])
+                'manufacturer' => mb_convert_encoding($currentrow['manufacturer_name'], "UTF-8", mb_detect_encoding($currentrow['manufacturer_name'])),
+                'category' => mb_convert_encoding($currentrow['component_type'], "UTF-8", mb_detect_encoding($currentrow['component_type']))
             ];
             $products[] = $one;
         }
@@ -351,11 +413,17 @@ if($mysql->connect_errno) { //if error
         }
 
         function displayProducts(filteredProducts) {
+            // Get reference to product list
+            const productContainer = document.getElementById("product-list");
+            
+            // Clear everything except pagination
+            const paginationElement = productContainer.querySelector(".pagination");
             productContainer.innerHTML = "";
+            
+            // Add back all products
             filteredProducts.forEach(product => {
                 const productElement = document.createElement("div");
                 productElement.className = "product";
-//the click to the new spot
                 productElement.addEventListener("click", () => {
                     const targetUrl = "component_details.php?id=" + encodeURIComponent(product.id);
                     console.log(`Navigating to: ${targetUrl}`);
@@ -363,22 +431,27 @@ if($mysql->connect_errno) { //if error
                 });
 
                 productElement.innerHTML = `
-                        <img src="${product.imgSrc}" alt="${product.name}">
-                        <div class="product-details">
-                            <div class="product-info">
-                                <h3>${product.name}</h3>
-                                <p>${product.description}</p>
-                                <p>Category: ${product.category}</p>
-                                <p>Manufacturer: ${product.manufacturer}</p>
-                            </div>
-                            <div class="product-price-stock">
-                                <p class="product-price">$${product.price.toFixed(2)}</p>
-                                <p class="stock-status">${inStock(product.stock)}</p>
-                            </div>
+                    <img src="${product.imgSrc}" alt="${product.name}">
+                    <div class="product-details">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <p>${product.description}</p>
+                            <p>Category: ${product.category}</p>
+                            <p>Manufacturer: ${product.manufacturer}</p>
                         </div>
-                    `;
+                        <div class="product-price-stock">
+                            <p class="product-price">$${product.price.toFixed(2)}</p>
+                            <p class="stock-status">${inStock(product.stock)}</p>
+                        </div>
+                    </div>
+                `;
                 productContainer.appendChild(productElement);
             });
+            
+            // Add pagination back at the end
+            if (paginationElement) {
+                productContainer.appendChild(paginationElement);
+            }
         }
 
         function filterProducts() {
