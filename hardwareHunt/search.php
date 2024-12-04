@@ -303,6 +303,13 @@ if($mysql->connect_errno) { //if error
             color: #ffffff;
         }
 
+        .component-card .product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin: 10px 0;
+        }
+
         @media (max-width: 768px) {
             .hero-section {
                 flex-direction: column;
