@@ -1,0 +1,159 @@
+/* General Page Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0 5%;
+}
+
+h1, h2, h3 {
+    color: #444;
+    margin-bottom: 15px;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+body ul li {
+    border: solid 2px #007BFF;
+    padding: 10px;
+    width: 250px;
+    text-align: center;
+    display: block;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    margin-left: 0;
+}
+
+body ul {
+  list-style-type: none;
+}
+
+/* Form Styles */
+form {
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 600px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+form input {
+    width: 95%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+form button:hover {
+    text-decoration: underline;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: #fff;
+    table-layout: fixed;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+table th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+table tr:hover {
+    background: #f1f1f1;
+}
+
+/* Action Buttons in Table */
+.action-button {
+    display: inline-block;
+    padding: 8px 12px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #007BFF;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+}
+
+.add-button {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.add-button:hover {
+    background-color: #138496;
+}
+
+.edit-button {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.edit-button:hover {
+    background-color: #218838;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+/* Images in Table */
+table img {
+    display: block;
+    max-width: 100px;
+    height: auto;
+    margin: 0 auto;
+}
