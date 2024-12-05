@@ -369,7 +369,7 @@ if($mysql->connect_errno) { //if error
                         <input type="text" class="search-input" placeholder="Search for parts" name="search-parts">
                         <button type="submit" class="search-btn">Search</button>
                     </form>
-                    <form action="projects_search.php" method="get" class="search-box" id="projects-search">
+                    <form action="project_results.php" method="get" class="search-box" id="projects-search">
                         <input type="text" class="search-input" placeholder="Search for projects" name="search-projects">
                         <button type="submit" class="search-btn">Search</button>
                     </form>
