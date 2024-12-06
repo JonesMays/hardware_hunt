@@ -254,8 +254,8 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         <a href="project_results.php">Projects</a>
     </nav>
     <div class="header-right">
-        <form action="component_results.php" method="get" >
-            <input type="search" id="search-bar" placeholder="Search..." name="search-parts" >
+        <form action="project_results.php" method="get">
+            <input type="search" id="search-bar" placeholder="Search..." name="search-parts">
         </form>
         <img src="user-icon.png" alt="User Icon" class="user-icon">
     </div>
@@ -304,7 +304,6 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
                 'description' => mb_convert_encoding($currentrow['project_description'], "UTF-8", mb_detect_encoding($currentrow['project_description'])),
                 'documentation' => mb_convert_encoding($currentrow['project_documentation_url'], "UTF-8", mb_detect_encoding($currentrow['project_documentation_url'])),
                 'date' => mb_convert_encoding($currentrow['date'], "UTF-8", mb_detect_encoding($currentrow['date'])),
-                'forks' => (int)$currentrow['fork_count'],
                 'cost' => (int)$currentrow['cost'],
                 // Using a placeholder image since project_image isn't in the database
                 'imgSrc' => 'placeholder.jpg'
@@ -340,7 +339,6 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
                             <h3>${product.name}</h3>
                             <p>${product.description}</p>
                             <p>Cost: $${product.cost}</p>
-                            <p>Forks: ${product.forks}</p>
                             <p>Date: ${product.date}</p>
                         </div>
                     </div>
