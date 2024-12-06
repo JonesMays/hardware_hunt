@@ -165,7 +165,7 @@ if($mysql->connect_errno) { //if error
             margin-bottom: 20px;
         }
 
-        .add-to-cart-btn {
+        .buy-btn {
             background-color: #ffaa33;
             color: #fff;
             padding: 10px 20px;
@@ -174,13 +174,23 @@ if($mysql->connect_errno) { //if error
             cursor: pointer;
             font-size: 1em;
         }
+
+        .add-to-fav-btn {
+            background-color: #ffaa33;
+            color: #ffaa33;
+            padding: 10px 10px 10px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: left;
+        }
         /*amanda added this: */
-        .add-to-cart-btn:hover {
+        .add-to-fav-btn:hover {
             background-color: #cc8800; /* Darker shade when hovered */
         }
-        .add-to-cart-btn.added {
-            background-color: white;
-            color: #ffaa33;
+        .add-to-fav-btn.added {
+            color: white;
         }
 
         .quantity-input {
@@ -369,31 +379,11 @@ if($mysql->connect_errno) { //if error
                 <div class="price"> $<?php echo $currentrow['price']; ?></div>
                 <div class="stock-status">Stock Quantity: <?php echo $currentrow['stock_quantity']; ?></div>
                 <div class="cart-section">
-                    <button class="add-to-cart-btn">Add to Favorites</button>
-<!--                    <input type="number" class="quantity-input" value="1" min="1">-->
-<!--                    amanda added. -->
-                    <script>
-                        // Select the button element
-                        const button = document.querySelector(".add-to-cart-btn");
-
-                        // Add an event listener for the 'click' event
-                        button.addEventListener("click", function () {
-                            if (button.classList.contains("added")) {
-                                // If the button is in the "added" state, revert to the default
-                                button.textContent = "Add to Favorites";
-                                button.classList.remove("added");
-                            } else {
-                                // If the button is in the default state, change to "added"
-                                button.textContent = "Added to Favorites";
-                                button.classList.add("added");
-                            }
-                        });
-                    </script>
+                    <a href="<?php echo $currentrow['purchase_link']; ?>" class="buy-btn" style="text-decoration: none;">Buy Now</a>
+                    <button class="add-to-fav-btn" style="background-color: transparent;" id="favoritesBtn">Add to Favorites</button>
                 </div>
                 <div class="divider"></div>
                 <div class="details-table">
-                    <div class="heading">Where To Buy</div>
-                    <div><a href="<?php echo $currentrow['purchase_link']; ?>" class="link-color">Buy Here</a></div>
                     <div class="heading">Manufacturer</div>
                     <div><?php echo $currentrow['manufacturer_name']; ?></div>
                     <div class="heading">Category</div>
@@ -568,18 +558,19 @@ if($mysql->connect_errno) { //if error
 </main>
 
 <script>
-    function toggleReviewForm() {
-        const form = document.getElementById('reviewForm');
-        form.style.display = form.style.display === 'none' || form.style.display === '' ? 'flex' : 'none';
-    }
-
-    function submitReview() {
-        const rating = document.getElementById('rating').value;
-        const review = document.getElementById('review').value;
-        alert(`Thank you for your review!\nRating: ${rating}\nReview: ${review}`);
-        // Add code to save the review to the database
-        toggleReviewForm();
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const favoritesBtn = document.getElementById('favoritesBtn');
+        
+        favoritesBtn.addEventListener('click', function() {
+            if (this.classList.contains('added')) {
+                this.textContent = 'Add to Favorites';
+                this.classList.remove('added');
+            } else {
+                this.textContent = 'Remove from Favorites';
+                this.classList.add('added');
+            }
+        });
+    });
 </script>
 
 </body>
