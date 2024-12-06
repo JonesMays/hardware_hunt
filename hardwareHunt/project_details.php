@@ -30,20 +30,9 @@ if($mysql->connect_errno) { //if error
     //echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
     //if you mess up username password serve then this error will come up.
 }
-?>
-<html>
 
-<body>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<?php
-$sql = "SELECT * from projects WHERE project_id = " . $_REQUEST['project_id'];
+// Modify the SQL query to get project details
+$sql = "SELECT * FROM projects WHERE project_id = " . intval($_REQUEST['id']);
 $results = $mysql->query($sql);
 
 if(!$results) {
@@ -51,17 +40,199 @@ if(!$results) {
     echo "SQL Error: " . $mysql->error . "<hr>";
     exit();
 }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details</title>
+    <link rel="stylesheet" href="menu.css">
+    <style>
+        .container {
+            width: 75%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
 
-while($currentrow = $results->fetch_assoc()) {
-    ?>
-    <strong>project name: </strong> <?php echo $currentrow['project_name']; ?><br>
-       <strong> project description: </strong><?php echo $currentrow['project_description']; ?><br>
-    <strong>project documentation: </strong><?php echo $currentrow['project_documentation_url']; ?><br>
-    <strong>project price: </strong><?php echo $currentrow['cost']; ?><br>
-    <strong>project fork count: </strong><?php echo $currentrow['fork_count']; ?><br>
+        .product-details {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            background-color: #2c2c2e;
+            padding: 20px;
+            border-radius: 8px;
+        }
 
+        .product-image {
+            width: 40%;
+            border-radius: 8px;
+            margin-right: 30px;
+        }
 
-<?php  }?>
+        .product-info {
+            width: 60%;
+        }
 
+        .product-name {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #ffaa33;
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .price {
+            font-size: 1.5em;
+            color: #ffaa33;
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            border-top: 1px solid #555;
+            margin: 20px 0;
+        }
+
+        .details-table {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px 20px;
+        }
+
+        .details-table .heading {
+            color: #888;
+            font-weight: bold;
+        }
+
+        .link-color {
+            color: #ffaa33;
+            text-decoration: none;
+        }
+
+        .link-color:hover {
+            text-decoration: underline;
+        }
+
+        .components-section {
+            background-color: #2c2c2e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .components-section h2 {
+            color: #ffaa33;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .component {
+            padding: 15px;
+            border-bottom: 1px solid #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .component:last-child {
+            border-bottom: none;
+        }
+
+        .component-price {
+            color: #ffaa33;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .product-details {
+                flex-direction: column;
+            }
+
+            .product-image,
+            .product-info {
+                width: 100%;
+            }
+
+            .details-table {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
+            <div class="header-left">
+                <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
+                <h1>Hardware Hunt</h1>
+            </div>
+        </a>
+        <nav class="header-center">
+            <a href="#about">About</a>
+            <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/component_results.php">Components</a>
+            <a href="#projects">Projects</a>
+        </nav>
+        <div class="header-right">
+            <img src="user-icon.png" alt="User Icon" class="user-icon">
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="product-details">
+            <?php
+            while($currentrow = $results->fetch_assoc()) {
+                ?>
+                <img src="project-placeholder.jpg" alt="Project Image" class="product-image">
+                <div class="product-info">
+                    <div class="product-name"><?php echo htmlspecialchars($currentrow['project_name']); ?></div>
+                    <div class="product-description"><?php echo htmlspecialchars($currentrow['project_description']); ?></div>
+                    <div class="price">Estimated Cost: $<?php echo htmlspecialchars($currentrow['cost']); ?></div>
+                    <div class="divider"></div>
+                    <div class="details-table">
+                        <div class="heading">Documentation</div>
+                        <div><a href="<?php echo htmlspecialchars($currentrow['project_documentation_url']); ?>" class="link-color" target="_blank">View Documentation</a></div>
+                        <div class="heading">Date Published</div>
+                        <div><?php echo htmlspecialchars($currentrow['date']); ?></div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+
+        <div class="sections-container">
+            <div class="components-section">
+                <h2>Required Components</h2>
+                <?php
+                // Query to get components used in this project
+                $sql = "SELECT c.* FROM component_details c 
+                        JOIN `projects-x-components` pc ON c.component_id = pc.component_id 
+                        WHERE pc.project_id = " . intval($_REQUEST['id']);
+                $components_result = $mysql->query($sql);
+
+                if ($components_result && $components_result->num_rows > 0) {
+                    while ($component = $components_result->fetch_assoc()) {
+                        ?>
+                        <div class="component">
+                            <a href="component_details.php?id=<?php echo $component['component_id']; ?>" class="link-color">
+                                <?php echo htmlspecialchars($component['component_name']); ?>
+                            </a>
+                            <span class="component-price">$<?php echo htmlspecialchars($component['price']); ?></span>
+                        </div>
+                        <?php
+                    }
+                } else {
+                    echo "<p>No components listed for this project.</p>";
+                }
+                ?>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
