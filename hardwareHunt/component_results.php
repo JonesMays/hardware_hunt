@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 // var_dump output variables ot the screen
 // request contains all submitted form information//
 // var_dump($_REQUEST);

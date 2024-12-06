@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 // var_dump output variables ot the screen
 // request contains all submitted form information
 // var_dump($_REQUEST);
@@ -108,12 +108,15 @@ if($mysql->connect_errno) { //if error
             width: 200px;
         }
 
-        /*.user-icon {*/
-        /*    width: 30px;*/
-        /*    height: auto;*/
-        /*    cursor: pointer;*/
-        /*    color: #ffffff;*/
-        /*}*/
+        .user-icon {
+            /*width: 30px;*/
+            /*height: auto;*/
+            /*cursor: pointer;*/
+            /*color: #ffffff;*/
+        }
+        .user-icon:hover {
+            opacity: 0.7; /* Adjust opacity for hover */
+        }
 
         .hero-section {
             display: flex;
@@ -351,7 +354,9 @@ if($mysql->connect_errno) { //if error
         <a href="#projects">Projects</a>
     </nav>
     <div class="header-right">
-        <img src="user-icon.png" alt="User Icon" class="user-icon">
+        <a href="profile.php">
+            <img src="user-icon.png" alt="User Icon" class="user-icon">
+        </a>
     </div>
 </header>
 
