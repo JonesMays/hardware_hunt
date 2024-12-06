@@ -327,7 +327,7 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
                 const productElement = document.createElement("div");
                 productElement.className = "product";
                 productElement.addEventListener("click", () => {
-                    const targetUrl = "project_description.php?id=" + encodeURIComponent(product.id);
+                    const targetUrl = "project_details.php?id=" + encodeURIComponent(product.id);
                     console.log(`Navigating to: ${targetUrl}`);
                     window.location.href = targetUrl;
                 });
