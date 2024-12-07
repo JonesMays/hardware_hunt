@@ -1,4 +1,5 @@
 <?php
+session_start();
 // test comment
 // var_dump output variables ot the screen
 // request contains all submitted form information
