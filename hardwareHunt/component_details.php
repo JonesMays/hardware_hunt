@@ -23,6 +23,50 @@ $mysql = new mysqli(
     $db
 );
 
+// Handle review submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'submit_review') {
+    // Verify user is logged in
+    if (!isset($_SESSION["user_user_id"])) {
+        echo "User must be logged in to submit review";
+        exit;
+    }
+    
+    // Validate inputs
+    $rating = intval($_POST['rating']);
+    $review = trim($_POST['review']);
+    $component_id = intval($_POST['component_id']);
+    $user_id = intval($_SESSION["user_user_id"]);
+    
+    // Check if user has already reviewed this component
+    $check_sql = "SELECT review_id FROM reviews WHERE user_id = ? AND component_id = ?";
+    $check_stmt = $mysql->prepare($check_sql);
+    $check_stmt->bind_param("ii", $user_id, $component_id);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+    
+    if ($check_result->num_rows > 0) {
+        echo "You have already reviewed this component";
+        $check_stmt->close();
+        exit;
+    }
+    $check_stmt->close();
+    
+    // Insert the review
+    $sql = "INSERT INTO reviews (component_id, user_id, rating_value, written_review) 
+            VALUES (?, ?, ?, ?)";
+            
+    $stmt = $mysql->prepare($sql);
+    $stmt->bind_param("iiis", $component_id, $user_id, $rating, $review);
+    
+    if ($stmt->execute()) {
+        // Redirect back to the same page
+        header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $component_id);
+        exit;
+    } else {
+        echo "Error saving review: " . $mysql->error;
+        exit;
+    }
+}
 
 // if I can find an error number then stop because there was a problem
 if($mysql->connect_errno) { //if error
@@ -431,12 +475,12 @@ if($mysql->connect_errno) { //if error
 <!--            <div class="project">Project 2: Environmental Monitoring</div>-->
 <!--            <div class="project">Project 3: Wearable Tech Prototype</div>-->
             <?php
+            // Single efficient query to get project details
+            $sql = "SELECT p.* FROM projects p 
+                    JOIN `projects-x-components` pc ON p.project_id = pc.project_id 
+                    WHERE pc.component_id = " . intval($_REQUEST['id']);
 
-
-            // Step 1: Query the projects-x-components table to get project_id(s) for the specified component_id
-            $sql = "SELECT project_id FROM `projects-x-components` WHERE component_id = " . $_REQUEST['id'];
             $results = $mysql->query($sql);
-
 
             if (!$results) {
                 echo "<hr>Your SQL:<br> " . $sql . "<br><br>";
@@ -444,40 +488,13 @@ if($mysql->connect_errno) { //if error
                 exit();
             }
 
-
-            $project_ids = []; // Initialize an array to store project_ids
-
-
-            while ($currentrow = $results->fetch_assoc()) {
-                $project_ids[] = $currentrow['project_id']; // Save each project_id to the array
-            }
-
-
-            // Step 2: If there are project_ids, build a query to get project details from the projects table
-            if (!empty($project_ids)) {
-                // Join the project_ids array into a comma-separated string for the SQL IN clause
-                $project_ids_str = implode(",", $project_ids);
-
-
-                $sql = "SELECT * FROM projects WHERE project_id IN ($project_ids_str)";
-                $project_results = $mysql->query($sql);
-
-
-                if (!$project_results) {
-                    echo "<hr>Your SQL:<br> " . $sql . "<br><br>";
-                    echo "SQL Error: " . $mysql->error . "<hr>";
-                    exit();
-                }
-
-                echo "<hr>";
-                // Step 3: Fetch and display project details
-                while ($project_row = $project_results->fetch_assoc()) {
+            if ($results->num_rows > 0) {
+                while ($project_row = $results->fetch_assoc()) {
                     echo "<div class='project'>";
-                    echo "<a href='project_details.php?project_id=" . $project_row['project_id']
+                    echo "<a href='project_details.php?id=" . $project_row['project_id'] 
                         . "' class='link-color'>" . $project_row['project_name'] . "</a>";
                     echo "</div><hr>";
                 }
-
             } else {
                 echo "No projects found for this component.";
             }
@@ -488,8 +505,8 @@ if($mysql->connect_errno) { //if error
             <h2>User Reviews</h2>
             <?php
             // Step 1: grab reviews with the component id of the details page selected
-            $sql = "SELECT r.component_id, r.review_id, r.user_id, r.project_id, r.rating_value, r.review_comments, r.created_at, u.username 
-        FROM reviews r 
+            $sql = "SELECT r.component_id, r.review_id, r.user_id, r.rating_value, r.written_review, u.first_name 
+        FROM reviews r
         JOIN users u ON r.user_id = u.user_id 
         WHERE r.component_id = " . intval($_REQUEST['id']); // Use JOIN to fetch username in a single query
 
@@ -507,57 +524,74 @@ if($mysql->connect_errno) { //if error
                     <div class="review">
                         <div class="review-header">
                             <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
-                            <span class="user-name"><?php echo htmlspecialchars($currentrow['username']); ?></span> <!-- Display username -->
+                            <span class="user-name"><?php echo htmlspecialchars($currentrow['first_name']); ?></span> <!-- Display username -->
                             <span class="rating"><?php echo str_repeat('★', $currentrow['rating_value']) . str_repeat('☆', 5 - $currentrow['rating_value']); ?></span>
                         </div>
-                        <p class="review-text"><?php echo htmlspecialchars($currentrow['review_comments']); ?></p>
+                        <p class="review-text"><?php echo htmlspecialchars($currentrow['written_review']); ?></p>
 <!--                        maybe fix ui so there is a date as well? amanda-->
 <!--                        <span class="review-date">--><?php //echo htmlspecialchars($currentrow['created_at']); ?><!--</span> Display date -->
                     </div>
                     <?php
                 }
             } else {
-                echo "No reviews found for this component.";
+                echo "No reviews found for this component.<br>";
             }
             ?>
-            <!-- Placeholder review content -->
-            <div class="review">
-                <div class="review-header">
-                    <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
-                    <span class="user-name">Jane Doe</span>
-                    <span class="rating">★★★★☆</span>
-                </div>
-                <p class="review-text">Great component! Worked perfectly for my IoT project.</p>
-            </div>
 
-            <div class="review">
-                <div class="review-header">
-                    <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
-                    <span class="user-name">Bryson Chan</span>
-                    <span class="rating">★★★★★</span>
-                </div>
-                <p class="review-text">Very versatile and easy to use.</p>
-            </div>
+            <?php if (isset($_SESSION["user_user_id"])) { ?>
+                <script>
+                    window.userFirstName = <?php echo json_encode($_SESSION["user_first_name"]); ?>;
+                </script>
+            <?php } ?>
 
             <!-- Write a Review button -->
-            <button class="write-review-btn" onclick="toggleReviewForm()">Write a Review</button>
-
-            <!-- Review Form -->
-            <div class="review-form" id="reviewForm">
-                <label for="rating">Rating:</label>
-                <select id="rating" name="rating">
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option>
-                    <option value="3">3 - Average</option>
-                    <option value="2">2 - Poor</option>
-                    <option value="1">1 - Very Poor</option>
-                </select>
-
-                <label for="review">Your Review:</label>
-                <textarea id="review" name="review" rows="4" placeholder="Write your review here..."></textarea>
-
-                <button onclick="submitReview()">Submit Review</button>
-            </div>
+            <?php
+            if (isset($_SESSION["user_user_id"])) {
+                // Check if user has already reviewed this component
+                $check_sql = "SELECT review_id FROM reviews WHERE user_id = ? AND component_id = ?";
+                $check_stmt = $mysql->prepare($check_sql);
+                $check_stmt->bind_param("ii", $_SESSION["user_user_id"], $_REQUEST['id']);
+                $check_stmt->execute();
+                $check_result = $check_stmt->get_result();
+                
+                if ($check_result->num_rows > 0) {
+                    echo '<div style="margin-top: 20px; text-align: center; color: #ffaa33;">
+                            Thank you for submitting a review!
+                          </div>';
+                } else {
+                    // User is logged in and hasn't reviewed yet, show the button
+                    echo '<button class="write-review-btn" onclick="toggleReviewForm()">Write a Review</button>';
+                    
+                    // Show the review form (it will still be hidden by default due to CSS)
+                    echo '<form class="review-form" id="reviewForm" method="POST">
+                            <input type="hidden" name="action" value="submit_review">
+                            <input type="hidden" name="component_id" value="' . $_REQUEST['id'] . '">
+                            
+                            <label for="rating">Rating:</label>
+                            <select id="rating" name="rating">
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Good</option>
+                                <option value="3">3 - Average</option>
+                                <option value="2">2 - Poor</option>
+                                <option value="1">1 - Very Poor</option>
+                            </select>
+            
+                            <label for="review">Your Review:</label>
+                            <textarea id="review" name="review" rows="4" placeholder="Write your review here..."></textarea>
+            
+                            <button type="submit">Submit Review</button>
+                        </form>';
+                }
+                $check_stmt->close();
+            } else {
+                // User is not logged in, show a message with a link to login
+                echo '<div style="margin-top: 20px; text-align: center;">
+                        <a href="login.php" class="link-color" style="text-decoration: none;">
+                            Login to write a review
+                        </a>
+                      </div>';
+            }
+            ?>
         </div>
     </div>
 </main>
@@ -576,6 +610,98 @@ if($mysql->connect_errno) { //if error
             }
         });
     });
+
+    function toggleReviewForm() {
+        const reviewForm = document.getElementById('reviewForm');
+        const writeReviewBtn = document.querySelector('.write-review-btn');
+        
+        // Check if the form is currently hidden
+        const isFormHidden = reviewForm.style.display === 'none' || reviewForm.style.display === '';
+        
+        if (isFormHidden) {
+            // Show the form
+            reviewForm.style.display = 'flex';
+            writeReviewBtn.textContent = 'Cancel Review';
+        } else {
+            // Hide the form
+            reviewForm.style.display = 'none';
+            writeReviewBtn.textContent = 'Write a Review';
+            // Reset the form
+            document.getElementById('rating').value = '5';
+            document.getElementById('review').value = '';
+        }
+    }
+
+    /*
+    function submitReview() {
+        const rating = document.getElementById('rating').value;
+        const review = document.getElementById('review').value;
+        const componentId = new URLSearchParams(window.location.search).get('id');
+        
+        // Basic validation
+        if (!review.trim()) {
+            alert('Please write a review before submitting.');
+            return;
+        }
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('action', 'submit_review');
+        formData.append('rating', rating);
+        formData.append('review', review);
+        formData.append('component_id', componentId);
+        
+        // Submit the review
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Create new review element
+                const reviewsSection = document.querySelector('.reviews-section');
+                const newReview = document.createElement('div');
+                newReview.className = 'review';
+                newReview.innerHTML = `
+                    <div class="review-header">
+                        <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
+                        <span class="user-name">${window.userFirstName || 'You'}</span>
+                        <span class="rating">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>
+                    </div>
+                    <p class="review-text">${review}</p>
+                `;
+                
+                // Insert new review after the h2 title
+                const h2Element = reviewsSection.querySelector('h2');
+                h2Element.insertAdjacentElement('afterend', newReview);
+                
+                // Remove the form and button
+                const reviewForm = document.getElementById('reviewForm');
+                const writeReviewBtn = document.querySelector('.write-review-btn');
+                
+                if (reviewForm) reviewForm.remove();
+                if (writeReviewBtn) writeReviewBtn.remove();
+                
+                // Add thank you message
+                const thankYouMessage = document.createElement('div');
+                thankYouMessage.style.marginTop = '20px';
+                thankYouMessage.style.textAlign = 'center';
+                thankYouMessage.style.color = '#ffaa33';
+                thankYouMessage.textContent = 'Thank you for submitting a review!';
+                
+                // Insert the thank you message where the button was
+                h2Element.insertAdjacentElement('afterend', thankYouMessage);
+                
+            } else {
+                alert(data.message || 'Error submitting review. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting review. Please try again.');
+        });
+    */
 </script>
 
 </body>

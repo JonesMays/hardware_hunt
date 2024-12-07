@@ -145,10 +145,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
         if ($results->num_rows > 0) {
             $user = $results->fetch_assoc();
+            $_SESSION["user_admin"] = $user['admin'];
+            $_SESSION["user_user_id"] = $user['user_id'];
             $_SESSION["user_email"] = $user['email'];
             $_SESSION["user_password"] = $user['password'];
-            $_SESSION["user_firstname"] = $user['first_name'];
-            $_SESSION["user_lastname"] = $user['last_name'];
+            $_SESSION["user_first_name"] = $user['first_name'];
+            $_SESSION["user_last_name"] = $user['last_name'];
             echo "<script>alert('Logged In');
                  window.location.href = 'search.php';
                 </script>";

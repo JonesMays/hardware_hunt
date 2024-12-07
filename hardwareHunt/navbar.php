@@ -87,7 +87,7 @@
         <a href="hardwareHunt/project_results.php">Projects</a>
     </nav>
     <div class="header-right">
-        <a href="hardwareHunt/NewPages/profile.html">
+        <a href="profile.php">
             <img src="user-icon.png" alt="User Icon" class="user-icon">
         </a>
     </div>

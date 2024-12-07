@@ -1,19 +1,10 @@
 <?php
 session_start();
-// var_dump output variables ot the screen
-// request contains all submitted form information
-// var_dump($_REQUEST);
-
-// echo "<br><br>hello " . $_REQUEST["fullname"];//
-
-//step 1 connect to database
-
+// Database connection code remains the same
 $host = "webdev.iyaserver.com";
 $userid = "nepo";
 $userpw = "BackendMagic1024";
 $db = "nepo_hardwareHunt2";
-
-// inlcude "../anvariables.php";
 
 $mysql = new mysqli(
     $host,
@@ -22,14 +13,18 @@ $mysql = new mysqli(
     $db
 );
 
-// if I can find an error number then stop because there was a problem
-if($mysql->connect_errno) { //if error
-    echo "db connection error : " . $mysql->connect_error; //tell me there was an erro
-    exit(); //stop running page
-} else {
-    // echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
-    //if you mess up username password serve then this error will come up.
+if($mysql->connect_errno) {
+    echo "db connection error : " . $mysql->connect_error;
+    exit();
 }
+
+// Get user's projects
+$user_id = $_SESSION['user_id'] ?? null;
+$projects_query = "SELECT * FROM projects WHERE user_id = ? OR user_id IS NULL ORDER BY date DESC LIMIT 5";
+$stmt = $mysql->prepare($projects_query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -199,16 +194,16 @@ if($mysql->connect_errno) { //if error
 <main>
     <div class="profile-container">
         <?php
-        echo "<h1>Hi, " . $_SESSION["user_firstname"] . "</h1>";
+        echo "<h1>Hi, " . $_SESSION["user_first_name"] . "</h1>";
         ?>
         <div class="user-details">
             <div>
                 <?php
                 echo "<p><strong>Name:</strong> <span id='name-display'>"
-                . $_SESSION["user_firstname"] . " " . $_SESSION["user_lastname"] .
+                . $_SESSION["user_first_name"] . " " . $_SESSION["user_last_name"] .
                 "</span></p>";
                 ?>
-                <input type="text" id="name-input" class="edit-input" value="<?php echo $_SESSION['user_firstname']; ?>">
+                <input type="text" id="name-input" class="edit-input" value="<?php echo $_SESSION["user_first_name"]; ?>">
                 <span class="edit-icon" id="edit-name" onclick="editField('name')">&#9998;</span>
                 <button class="save-button" id="save-name" onclick="saveField('name')">Save</button>
             </div>
@@ -225,26 +220,29 @@ if($mysql->connect_errno) { //if error
         <div class="projects-section">
             <h2>Your Projects</h2>
             <div class="project-list">
-                <div class="project-item">
-                    <img src="project-image.jpg" alt="Project 1">
-                    <div class="project-details">
-                        <div class="project-info">
-                            <h3>Project 1</h3>
-                            <p>Smart Lighting System</p>
-                            <p>Category: Electronics</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="project-item">
-                    <img src="project-image.jpg" alt="Project 2">
-                    <div class="project-details">
-                        <div class="project-info">
-                            <h3>Project 2</h3>
-                            <p>IoT Temperature Monitor</p>
-                            <p>Category: IoT</p>
-                        </div>
-                    </div>
-                </div>
+                <?php
+                if ($result->num_rows > 0) {
+                    while ($project = $result->fetch_assoc()) {
+                        ?>
+                        <a href="project_details.php?id=<?php echo htmlspecialchars($project['project_id']); ?>" style="text-decoration: none; color: inherit;">
+                            <div class="project-item">
+                                <img src="/api/placeholder/200/150" alt="Project Image">
+                                <div class="project-details">
+                                    <div class="project-info">
+                                        <h3><?php echo htmlspecialchars($project['project_name']); ?></h3>
+                                        <p><?php echo htmlspecialchars($project['project_description']); ?></p>
+                                        <p>Date: <?php echo date('m/d/Y', strtotime($project['date'])); ?></p>
+                                        <p>Cost: $<?php echo htmlspecialchars($project['cost']); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <?php
+                    }
+                } else {
+                    echo "<p>No projects found.</p>";
+                }
+                ?>
             </div>
             <button class="add-project-button">Add Project</button>
         </div>
@@ -252,6 +250,7 @@ if($mysql->connect_errno) { //if error
 </main>
 
 <script>
+    // Your existing JavaScript remains the same
     function editField(field) {
         const displayElement = document.getElementById(`${field}-display`);
         const inputElement = document.getElementById(`${field}-input`);
