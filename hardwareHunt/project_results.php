@@ -2,7 +2,7 @@
 
 // var_dump output variables ot the screen
 // request contains all submitted form information//
- var_dump($_REQUEST);
+// var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
 
@@ -27,7 +27,7 @@ if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro
     exit(); //stop running page
 } else {
-    echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
+    // echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
     //if you mess up username password serve then this error will come up.
 }
 
@@ -240,30 +240,11 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
     </style>
 </head>
 <body>
-<header>
-    <!--
-    <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
-        <div class="header-left">
-            <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
-            <h1>Hardware Hunt</h1>
-        </div>
-    </a>
-
-    <nav class="header-center">
-        <a href="#about">About</a>
-        <a href="component_results.php">Components</a>
-        <a href="project_results.php">Projects</a>
-    </nav>
-    -->
-    <?php include 'navbar.php'; ?>
-    <div class="header-right">
-        <form action="project_results.php" method="get">
-            <input type="search" id="search-bar" placeholder="Search..." name="search-parts">
-        </form>
-        <img src="user-icon.png" alt="User Icon" class="user-icon">
-    </div>
-</header>
-
+<?php
+    $showPartsSearchBar = false;
+    $showProjectsSearchBar = true;
+    include 'navbar.php';
+?>
 <div class="main-content-wrapper">
     <div class="main-content">
         <main id="product-list">
@@ -285,8 +266,8 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         <?php
         $sql = "SELECT * FROM projects WHERE 1=1";
 
-        if (isset($_REQUEST['search-parts'])) {
-            $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
+        if (isset($_REQUEST['search-projects'])) {
+            $searchTerm = $mysql->real_escape_string($_REQUEST['search-projects']);
 
             $sql .= " AND (project_name LIKE '%$searchTerm%' OR project_description LIKE '%$searchTerm%')";
         }

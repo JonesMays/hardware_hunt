@@ -55,6 +55,9 @@ if($mysql->connect_errno) { //if error
             background-repeat: no-repeat;
             background-size: 100vw 100vh;
         }
+        header {
+            padding: 0;
+        }
         /*header {*/
         /*    background-color: #2c2c2e;*/
         /*    color: #fff;*/
@@ -340,8 +343,6 @@ if($mysql->connect_errno) { //if error
     </style>
 </head>
 <body>
-
-<header>
     <!--
     <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
         <div class="header-left">
@@ -360,8 +361,10 @@ if($mysql->connect_errno) { //if error
         </a>
     </div>
     -->
-    <?php include 'navbar.php'; ?>
-</header>
+    <?php
+        $showSearchBar = false;
+        include 'navbar.php';
+    ?>
 
 <main>
     <div class="hero-section">

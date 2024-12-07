@@ -2,7 +2,7 @@
 session_start();
 // var_dump output variables ot the screen
 // request contains all submitted form information
-var_dump($_REQUEST);
+// var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
 
@@ -167,28 +167,11 @@ if(!$results) {
         }
     </style>
 </head>
+<?php
+    $showSearchBar = false;
+    include 'navbar.php';
+?>
 <body>
-    <header>
-        <!--
-        <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
-            <div class="header-left">
-                <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
-                <h1>Hardware Hunt</h1>
-            </div>
-        </a>
-        <nav class="header-center">
-            <a href="#about">About</a>
-            <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/component_results.php">Components</a>
-            <a href="#projects">Projects</a>
-        </nav>
-        <div class="header-right">
-            <img src="user-icon.png" alt="User Icon" class="user-icon">
-        </div>
-        -->
-        <?php include 'navbar.php'; ?>
-
-    </header>
-
     <main class="container">
         <div class="product-details">
             <?php

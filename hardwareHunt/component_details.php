@@ -3,7 +3,7 @@ session_start();
 // test comment
 // var_dump output variables ot the screen
 // request contains all submitted form information
-var_dump($_REQUEST);
+// var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
 
@@ -386,27 +386,10 @@ if($mysql->connect_errno) { //if error
 </head>
 <body>
 
-<header>
-    <!--
-    <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
-        <div class="header-left">
-            <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
-            <h1>Hardware Hunt</h1>
-        </div>
-    </a>
-    <nav class="header-center">
-        <a href="#about">About</a>
-        <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/component_results.php">Components</a>
-        <a href="#projects">Projects</a>
-    </nav>
-    <div class="header-right">
-        <img src="user-icon.png" alt="User Icon" class="user-icon">
-    </div>
-    -->
-    <?php include 'navbar.php'; ?>
-
-</header>
-
+<?php
+    $showSearchBar = false;
+    include 'navbar.php';
+?>
 <main class="container">
     <div class="product-details">
         <?php
@@ -429,7 +412,7 @@ if($mysql->connect_errno) { //if error
                 <div class="stock-status">Stock Quantity: <?php echo $currentrow['stock_quantity']; ?></div>
                 <div class="cart-section">
                     <a href="<?php echo $currentrow['purchase_link']; ?>" class="buy-btn" style="text-decoration: none;">Buy Now</a>
-                    <button class="add-to-fav-btn" style="background-color: transparent;" id="favoritesBtn">Add to Favorites</button>
+                    <!-- <button class="add-to-fav-btn" style="background-color: transparent;" id="favoritesBtn">Add to Favorites</button> -->
                 </div>
                 <div class="divider"></div>
                 <div class="details-table">

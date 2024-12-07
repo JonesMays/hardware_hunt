@@ -297,26 +297,11 @@ $offset = ($currentPage - 1) * $productsPerPage;
     </style>
 </head>
 <body>
-<header>
-    <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
-        <div class="header-left">
-            <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
-            <h1>Hardware Hunt</h1>
-        </div>
-    </a>
-
-    <nav class="header-center">
-        <a href="#about">About</a>
-        <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/component_results.php">Components</a>
-        <a href="#projects">Projects</a>
-    </nav>
-    <div class="header-right">
-        <form action="component_results.php" method="get">
-            <input type="search" id="search-bar" placeholder="Search..." name="search-parts">
-        </form>
-        <img src="user-icon.png" alt="User Icon" class="user-icon">
-    </div>
-</header>
+<?php
+    $showPartsSearchBar = true;
+    $showProjectsSearchBar = false;
+    include 'navbar.php';
+?>
 
 <div class="main-content-wrapper">
     <div class="main-content">

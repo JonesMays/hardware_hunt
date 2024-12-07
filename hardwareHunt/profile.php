@@ -62,6 +62,26 @@ $result = $stmt->get_result();
             text-align: center;
         }
 
+        .admin-button {
+            position: absolute;
+            top: 2em;
+            right: 2em;
+            background-color: #ffaa33;
+            color: #1c1c1e;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .admin-button:hover {
+            background-color: #e5992e;
+        }
+
+        .profile-container {
+            position: relative;  /* Add this to the existing profile-container style */
+        }
+
         .user-details {
             margin-bottom: 2em;
         }
@@ -187,12 +207,18 @@ $result = $stmt->get_result();
         }
     </style>
 </head>
+<?php
+    $showSearchBar = false;
+    include 'navbar.php';
+?>
 <body>
-
-<iframe src="NewPages/navbar.html" style="border: none; width: 100%; height: auto;" id="navbar"></iframe>
-
 <main>
     <div class="profile-container">
+        <?php
+        if(isset($_SESSION['user_admin']) && $_SESSION['user_admin'] == 1) {
+            echo '<a href="HH Admin Website/index.php" class="admin-button">Admin Panel</a>';
+        }
+        ?>
         <?php
         echo "<h1>Hi, " . $_SESSION["user_first_name"] . "</h1>";
         ?>
