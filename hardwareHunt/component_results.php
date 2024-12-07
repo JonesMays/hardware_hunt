@@ -1,8 +1,8 @@
 <?php
-session_start();
+
 // var_dump output variables ot the screen
-// request contains all submitted form information//
-// var_dump($_REQUEST);
+// request contains all submitted form information
+var_dump($_REQUEST);
 
 // echo "<br><br>hello " . $_REQUEST["fullname"];
 
@@ -21,7 +21,7 @@ $mysql = new mysqli(
     $userpw,
     $db
 );
-//
+
 // if I can find an error number then stop because there was a problem
 if($mysql->connect_errno) { //if error
     echo "db connection error : " . $mysql->connect_error; //tell me there was an erro
@@ -30,29 +30,6 @@ if($mysql->connect_errno) { //if error
     // echo "db connection success!"; //slaytastic. no errors, removing to get rid of it on page
     //if you mess up username password serve then this error will come up.
 }
-
-// Get total number of products for pagination
-$countSql = "SELECT COUNT(*) as total FROM component_details WHERE 1=1";
-if (isset($_REQUEST['search-parts'])) {
-    $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
-    $countSql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
-}
-$countResult = $mysql->query($countSql);
-$totalProducts = $countResult->fetch_assoc()['total'];
-
-// Set pagination variables
-$productsPerPage = 10; // Adjust this number as needed
-$totalPages = ceil($totalProducts / $productsPerPage);
-$currentPage = isset($_REQUEST['page']) ? max(1, min($totalPages, intval($_REQUEST['page']))) : 1;
-$offset = ($currentPage - 1) * $productsPerPage;
-
-// Modify your existing SQL query to include LIMIT and OFFSET
-$sql = "SELECT * FROM component_details WHERE 1=1";
-if (isset($_REQUEST['search-parts'])) {
-    $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
-    $sql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
-}
-$sql .= " LIMIT $productsPerPage OFFSET $offset";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,13 +56,11 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         }
 
         #filters {
-            width: 30%;
+            width: 30%; 
             padding: 1.5em;
             background-color: #2c2c2e;
             color: #ffffff;
             border-radius: 10px;
-            max-height: 80vh;
-            overflow-y: auto;
         }
 
         #filters h2 {
@@ -96,6 +71,7 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
 
         .filter-section {
             margin-bottom: 1.5em;
+            padding: 0;
         }
 
         .filter-section label {
@@ -106,8 +82,57 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         }
 
         .filter-option {
-            margin-left: 1em;
             color: #d1d1d3;
+        }
+
+        .filter-drop-down{
+            background-color: transparent;
+            color: #d1d1d3;
+            border: 2px solid #a1a1a3; 
+            width: 20vw;
+            border-radius: 20px;
+            align-items: center; /* Aligns items vertically */
+            padding: 8px;
+            font-size: 1em;
+            transition: max-height 0.3s ease; 
+        }
+
+        .filter-drop-down-header{
+            display: flex;
+            justify-content: space-between; /* Pushes text and chevron to opposite sides */
+        }
+
+        #filter-word-field{
+            background-color: transparent;
+            color: white;
+            border: 2px solid #a1a1a3; 
+            width: 20vw;
+            height: 2.75vw;
+            border-radius: 20px;
+            padding: 1vw;
+            font-size: 1.2em;
+        }
+
+        .filter-chevron{
+            width: 2vw;
+            height: 1.5vw;
+        }
+
+        .filter-chevron-rotated{
+            transform: rotate(180deg);
+        }
+
+        .filter-drop-down-open{
+            height: auto;
+            
+        }
+
+        .clear-button {
+            background-color: transparent;
+            color: #a1a1a3;
+            border: 2px solid #a1a1a3;
+            border-radius: 20px;
+            width: 3.5vw; 
         }
 
         #price-label {
@@ -127,12 +152,6 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
             padding: 1.5em;
             background-color: #1c1c1e;
             border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .products-container {
-            flex: 1;
         }
 
         .product {
@@ -232,36 +251,10 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
                 margin-top: 0.5em;
             }
         }
-
-        .pagination {
-            margin-top: 2em;
-            display: flex;
-            justify-content: center;
-            gap: 0.5em;
-            width: 100%;
-        }
-
-        .page-link {
-            padding: 0.5em 1em;
-            background-color: #2c2c2e;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-        }
-
-        .page-link:hover {
-            background-color: #3c3c3e;
-        }
-
-        .page-link.active {
-            background-color: #0a84ff;
-        }
     </style>
 </head>
 <body>
 <header>
-    <!--
     <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
         <div class="header-left">
             <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
@@ -274,9 +267,6 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/component_results.php">Components</a>
         <a href="#projects">Projects</a>
     </nav>
-    -->
-    <?php include 'navbar.php'; ?>
-
     <div class="header-right">
         <form action="component_results.php" method="get" >
             <input type="search" id="search-bar" placeholder="Search..." name="search-parts" >
@@ -289,52 +279,46 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
     <div class="main-content">
         <aside id="filters">
             <h2>Filters</h2>
+            
             <div class="filter-section">
-                <label>Manufacturer</label>
-
-                <?php
-
-                $sql = "SELECT * FROM manufacturers";
-
-                $results = $mysql->query($sql);
-
-                if(!$results) {
-                    echo "SQL error: ". $mysql->error;
-                    exit();
-                }
-
-                while ($currentrow = $results->fetch_assoc()) {
-                    echo '<div class="filter-option">';
-                    echo '<input type="checkbox" name="manufacturer" value="' .
-                        $currentrow['manufacturer_name'] . '" checked> ' .
-                        $currentrow['manufacturer_name'];
-                    echo '</div>';
-                }
-                ?>
+                <label>Keywords</label>
+                <input type="text" id="filter-word-field" name="Keywords" placeholder="Type here" oninput="KeywordSearch()">
             </div>
-
+            
             <div class="filter-section">
-                <label>Category</label>
-                <!--                php that shows all component type-->
-                <?php
 
-                $sql = "SELECT * FROM componentType";
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: .25vw;">
+                        <label>Manufacturer</label>
+                        <button type="button" onclick="ClearManufacturerCheckBoxes()" class="clear-button">Clear</button>
+                    </div>
+            
+                    <div class="filter-drop-down" id="filter-manufacturer-drop-down">
+                        <div class="filter-drop-down-header">  
+                            <div class="filter-option">
+                                <input type="checkbox" name="manufacturer" value="all" checked> All
+                            </div>
+                            <img src="chevron.png" alt="Icon that indicates you can expand bar" width="300" class="filter-chevron" id="filter-manufacturer-chevron" onClick="ToggleManufacturerDropdown()">
+                        </div>
+                    </div>
+                    
+            </div>
+            
+            <div class="filter-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: .25vw;">
+                        <label>Category</label>
+                        <button type="button" onclick="ClearCategoryCheckBoxes()" class="clear-button">Clear</button>
+                    </div>
 
-                $results = $mysql->query($sql);
+                    <div class="filter-drop-down" id="filter-category-drop-down">
+                        
+                        <div class="filter-drop-down-header">
+                            <div class="filter-option">
+                                <input type="checkbox" name="category" value="all"> All
+                            </div>
+                            <img src="chevron.png" alt="Icon that indicates you can expand bar" width="300" class="filter-chevron" id="filter-category-chevron" onClick="ToggleCategoryDropdown()">
+                        </div>
 
-                if(!$results) {
-                    echo "SQL error: ". $mysql->error;
-                    exit();
-                }
-
-                while ($currentrow = $results->fetch_assoc()) {
-                    echo '<div class="filter-option">';
-                    echo '<input type="checkbox" name="category" value="' .
-                        $currentrow['component_type'] . '" checked> ' .
-                        $currentrow['component_type'];
-                    echo '</div>';
-                }
-                ?>
+                    </div>
             </div>
 
             <div class="filter-section">
@@ -345,20 +329,162 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         </aside>
 
         <main id="product-list">
-            <div class="pagination">
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="?page=<?php echo $i; ?><?php echo isset($_REQUEST['search-parts']) ? '&search-parts=' . urlencode($_REQUEST['search-parts']) : ''; ?>" 
-                    class="page-link <?php echo $i === $currentPage ? 'active' : ''; ?>">
-                        <?php echo $i; ?>
-                    </a>
-                <?php endfor; ?>
-            </div>
         </main>
     </div>
 </div>
 
 <script>
+
     document.addEventListener("DOMContentLoaded", function() {
+        
+         manufacturerCheckboxes = document.querySelectorAll("input[name='manufacturer']");
+         categoryCheckboxes = document.querySelectorAll("input[name='category']");
+    
+        window.ToggleManufacturerDropdown = function(){
+            const dropchevron = document.querySelector('#filter-manufacturer-chevron');
+            const dropdown = document.querySelector('#filter-manufacturer-drop-down');
+        
+            if (!dropdown) {
+                console.error("Element with class 'filter-drop-down' not found.");
+                return;
+            }
+        
+            dropdown.classList.toggle('filter-drop-down-open');
+            dropchevron.classList.toggle('filter-chevron-rotated');
+            const isDropdownOpen = dropdown.classList.contains('filter-drop-down-open');
+        
+            const manufacturersID = 'manufacturersID';
+        
+            if (isDropdownOpen) {
+                if (!document.getElementById(manufacturersID)) {
+                    const manufacturersContainer = document.createElement('div');
+                    manufacturersContainer.id = manufacturersID;
+                    manufacturersContainer.className = 'filter-option';
+        
+                    const manufacturersData = <?php
+                        $sql = "SELECT * FROM manufacturers";
+                        $results = $mysql->query($sql);
+        
+                        if (!$results) {
+                            echo "console.error('SQL Error: " . addslashes($mysql->error) . "');";
+                            exit();
+                        }
+        
+                        $manufacturers = [];
+                        while ($currentrow = $results->fetch_assoc()) {
+                            $manufacturers[] = [
+                                'name' => $currentrow['manufacturer_name']
+                            ];
+                        }
+                        echo json_encode($manufacturers);
+                    ?>;
+        
+                    manufacturersData.forEach(manufacturer => {
+                        const manufacturerOption = document.createElement('div');
+                        manufacturerOption.className = 'filter-option';
+                        manufacturerOption.innerHTML = `
+                            <input type="checkbox" name="manufacturer" value="${manufacturer.name}"> ${manufacturer.name}
+                        `;
+                        manufacturersContainer.appendChild(manufacturerOption);
+                    });
+        
+                    dropdown.appendChild(manufacturersContainer);
+                    
+                    manufacturerCheckboxes = document.querySelectorAll("input[name='manufacturer']");
+                        manufacturerCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener("change", filterProducts);
+                    });
+                }
+            } else {
+                const existingOption = document.getElementById(manufacturersID);
+                if (existingOption) {
+                    existingOption.remove();
+                }
+            }
+        }
+        
+        window.ToggleCategoryDropdown = function(){
+            const dropchevron = document.querySelector('#filter-category-chevron');
+            const dropdown = document.querySelector('#filter-category-drop-down');
+        
+            if (!dropdown) {
+                console.error("Element with class 'filter-drop-down' not found.");
+                return;
+            }
+        
+            dropdown.classList.toggle('filter-drop-down-open');
+            dropchevron.classList.toggle('filter-chevron-rotated');
+            const isDropdownOpen = dropdown.classList.contains('filter-drop-down-open');
+        
+            const categoriesID = 'categoryID';
+        
+            if (isDropdownOpen) {
+                if (!document.getElementById(categoriesID)) {
+                    const categoriesContainer = document.createElement('div');
+                    categoriesContainer.id = categoriesID;
+                    categoriesContainer.className = 'filter-option';
+        
+                    const categoriesData = <?php
+                        $sql = "SELECT * FROM componentType";
+                        $results = $mysql->query($sql);
+        
+                        if (!$results) {
+                            echo "console.error('SQL Error: " . addslashes($mysql->error) . "');";
+                            exit();
+                        }
+        
+                        $categories = [];
+                        while ($currentrow = $results->fetch_assoc()) {
+                            $categories[] = [
+                                'name' => $currentrow['component_type']
+                            ];
+                        }
+                        echo json_encode($categories);
+                    ?>;
+        
+                    categoriesData.forEach(category => {
+                        const categoryOption = document.createElement('div');
+                        categoryOption.className = 'filter-option';
+                        categoryOption.innerHTML = `
+                            <input type="checkbox" name="category" value="${category.name}"> ${category.name}
+                        `;
+                        categoriesContainer.appendChild(categoryOption);
+                    });
+        
+                    dropdown.appendChild(categoriesContainer);
+                    
+                    categoryCheckboxes = document.querySelectorAll("input[name='category']");
+                        categoryCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener("change", filterProducts);
+                    });
+                }
+            } else {
+                const existingOption = document.getElementById(categoriesID);
+                if (existingOption) {
+                    existingOption.remove();
+                }
+            }
+        }
+        
+        window.ClearCategoryCheckBoxes = function(){
+    
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        
+            console.log("All category checkboxes cleared.");
+            
+        }
+        
+        window.ClearManufacturerCheckBoxes = function(){
+    
+            manufacturerCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        
+            console.log("All manufacturer checkboxes cleared.");
+            
+        }
 
         <?php
         $sql = "SELECT * FROM component_details WHERE 1=1";
@@ -369,26 +495,26 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
             $sql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
         }
 
-        $sql .= " LIMIT $productsPerPage OFFSET $offset";
-
+        // echo $sql;
         $results = $mysql->query($sql);
         if (!$results) {
             echo "console.error('SQL Error: " . $mysql->error . "');";
             exit();
         }
-//make products array
+        
+        //make products array
         $products = [];
         while ($currentrow = $results->fetch_assoc()) {
             // echo json_encode($currentrow, JSON_THROW_ON_ERROR);
             $one = [
-                'id' => mb_convert_encoding($currentrow['component_id'], "UTF-8", mb_detect_encoding($currentrow['component_id'])),
-                'name' => mb_convert_encoding($currentrow['component_name'], "UTF-8", mb_detect_encoding($currentrow['component_name'])),
+                'id' => utf8_encode($currentrow['component_id']),
+                'name' => utf8_encode($currentrow['component_name']),
                 'price' => (float)$currentrow['price'],
-                'imgSrc' => mb_convert_encoding($currentrow['component_image'], "UTF-8", mb_detect_encoding($currentrow['component_image'])),
-                'description' => mb_convert_encoding($currentrow['component_description'], "UTF-8", mb_detect_encoding($currentrow['component_description'])),
+                'imgSrc' => utf8_encode($currentrow['component_image']),
+                'description' => utf8_encode(addslashes($currentrow['component_description'])),
                 'stock' => (int)$currentrow['stock_quantity'],
-                'manufacturer' => mb_convert_encoding($currentrow['manufacturer_name'], "UTF-8", mb_detect_encoding($currentrow['manufacturer_name'])),
-                'category' => mb_convert_encoding($currentrow['component_type'], "UTF-8", mb_detect_encoding($currentrow['component_type']))
+                'manufacturer' => utf8_encode($currentrow['manufacturer_name']),
+                'category' => utf8_encode($currentrow['component_type'])
             ];
             $products[] = $one;
         }
@@ -399,9 +525,8 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         ?>
 
         const productContainer = document.getElementById("product-list");
-        const manufacturerCheckboxes = document.querySelectorAll("input[name='manufacturer']");
-        const categoryCheckboxes = document.querySelectorAll("input[name='category']");
-//if in stock or not.
+        
+        //if in stock or not.
         function inStock(stock) {
             if (stock > 20)
             {
@@ -417,17 +542,11 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         }
 
         function displayProducts(filteredProducts) {
-            // Get reference to product list
-            const productContainer = document.getElementById("product-list");
-            
-            // Clear everything except pagination
-            const paginationElement = productContainer.querySelector(".pagination");
             productContainer.innerHTML = "";
-            
-            // Add back all products
             filteredProducts.forEach(product => {
                 const productElement = document.createElement("div");
                 productElement.className = "product";
+//the click to the new spot
                 productElement.addEventListener("click", () => {
                     const targetUrl = "component_details.php?id=" + encodeURIComponent(product.id);
                     console.log(`Navigating to: ${targetUrl}`);
@@ -435,52 +554,50 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
                 });
 
                 productElement.innerHTML = `
-                    <img src="${product.imgSrc}" alt="${product.name}">
-                    <div class="product-details">
-                        <div class="product-info">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                            <p>Category: ${product.category}</p>
-                            <p>Manufacturer: ${product.manufacturer}</p>
+                        <img src="${product.imgSrc}" alt="${product.name}">
+                        <div class="product-details">
+                            <div class="product-info">
+                                <h3>${product.name}</h3>
+                                <p>${product.description}</p>
+                                <p>Category: ${product.category}</p>
+                                <p>Manufacturer: ${product.manufacturer}</p>
+                            </div>
+                            <div class="product-price-stock">
+                                <p class="product-price">$${product.price.toFixed(2)}</p>
+                                <p class="stock-status">${inStock(product.stock)}</p>
+                            </div>
                         </div>
-                        <div class="product-price-stock">
-                            <p class="product-price">$${product.price.toFixed(2)}</p>
-                            <p class="stock-status">${inStock(product.stock)}</p>
-                        </div>
-                    </div>
-                `;
+                    `;
                 productContainer.appendChild(productElement);
             });
-            
-            // Add pagination back at the end
-            if (paginationElement) {
-                productContainer.appendChild(paginationElement);
-            }
         }
 
         function filterProducts() {
+            
             const maxPrice = parseFloat(priceRangeInput.value);
 
             const selectedManufacturers = Array.from(manufacturerCheckboxes)
                 .filter(checkbox => checkbox.checked)
-                .map(checkbox => checkbox.value);
+                .map(checkbox => checkbox.value.toLowerCase());
 
             const selectedCategories = Array.from(categoryCheckboxes)
                 .filter(checkbox => checkbox.checked)
-                .map(checkbox => checkbox.value);
+                .map(checkbox => checkbox.value.toLowerCase());
 
-            const filteredProducts = products.filter(product =>
-                selectedManufacturers.includes(product.manufacturer) &&
-                selectedCategories.includes(product.category) &&
-                product.price <= maxPrice
-            );
+            const filteredProducts = products.filter(product => {
+            
+                return (
+                    (selectedManufacturers.length === 0 || selectedManufacturers.includes(product.manufacturer.toLowerCase())) &&
+                    (selectedCategories.length === 0 || selectedCategories.includes(product.category.toLowerCase())) &&
+                    product.price <= maxPrice
+                    
+                );
+            });
 
+            console.log( filteredProducts);
+            
             displayProducts(filteredProducts);
         }
-
-        [...manufacturerCheckboxes, ...categoryCheckboxes].forEach(checkbox => {
-            checkbox.addEventListener("change", filterProducts);
-        });
 
         displayProducts(products);
         console.log(products);
@@ -489,11 +606,35 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         const priceValueDisplay = document.getElementById("price-value");
 
         priceRangeInput.addEventListener("input", function(event) {
-            const maxPrice = event.target.value;
+            const maxPrice = event.target.value; 
             priceValueDisplay.innerText = maxPrice;
 
             filterProducts();  // Reapply filters with the updated price range
         });
+        
+        //This function is called when a keyword is inputed in the field
+        window.KeywordSearch = function () {
+            
+            const keyword = document.getElementById("filter-word-field").value.toLowerCase();
+            
+            if (keyword.trim() === "") {
+                displayProducts(products); // Show all products if no keyword
+                return;
+            }
+            
+            const filteredProducts = products.filter(product => {
+                return (
+                    product.name.toLowerCase().includes(keyword) ||
+                    product.description.toLowerCase().includes(keyword) ||
+                    product.category.toLowerCase().includes(keyword) ||
+                    product.manufacturer.toLowerCase().includes(keyword)
+                );
+            });
+            
+            displayProducts(filteredProducts);
+            
+        }
+        
     });
 </script>
 </body>
