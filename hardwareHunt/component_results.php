@@ -11,6 +11,10 @@ $mysql = new mysqli(
     $userpw,
     $db
 );
+if (!$mysql->set_charset("utf8")) {
+    echo "Error loading character set utf8: " . $mysql->error;
+    exit();
+}
 
 if($mysql->connect_errno) {
     echo "db connection error : " . $mysql->connect_error;
