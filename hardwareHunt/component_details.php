@@ -342,6 +342,7 @@ if($mysql->connect_errno) { //if error
 <body>
 
 <header>
+    <!--
     <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
         <div class="header-left">
             <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
@@ -356,6 +357,9 @@ if($mysql->connect_errno) { //if error
     <div class="header-right">
         <img src="user-icon.png" alt="User Icon" class="user-icon">
     </div>
+    -->
+    <?php include 'navbar.php'; ?>
+
 </header>
 
 <main class="container">

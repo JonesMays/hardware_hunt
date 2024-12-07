@@ -261,6 +261,7 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
 </head>
 <body>
 <header>
+    <!--
     <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/search.php" style="text-decoration: none;">
         <div class="header-left">
             <img src="HHlogo.png" alt="Hardware Hunt Logo" class="logo">
@@ -273,6 +274,9 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
         <a href="http://nepo.webdev.iyaserver.com/acad276/hardwareHunt/component_results.php">Components</a>
         <a href="#projects">Projects</a>
     </nav>
+    -->
+    <?php include 'navbar.php'; ?>
+
     <div class="header-right">
         <form action="component_results.php" method="get" >
             <input type="search" id="search-bar" placeholder="Search..." name="search-parts" >
