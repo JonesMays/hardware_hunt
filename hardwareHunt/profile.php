@@ -1,5 +1,29 @@
 <?php
-session_start();
+
+// Start the session only if it's not already active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+// Check if logout request is made
+if (isset($_GET['logout'])) {
+    // Start session if not already started
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Destroy the session
+    session_destroy();
+
+    // Redirect to the home page
+    header("Location: search.php");
+    exit();
+}
+?>
+
+<?php
+
+
+
 // Database connection code remains the same
 $host = "webdev.iyaserver.com";
 $userid = "nepo";
@@ -205,6 +229,21 @@ $result = $stmt->get_result();
         .add-project-button:hover {
             background-color: #e5992e;
         }
+        
+        .logout-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .logout-button:hover {
+            background-color: #e60000;
+        }
+
     </style>
 </head>
 <?php
@@ -220,9 +259,18 @@ $result = $stmt->get_result();
         }
         ?>
         <?php
+        
+        
         echo "<h1>Hi, " . $_SESSION["user_first_name"] . "</h1>";
         ?>
         <div class="user-details">
+            
+            <form action="profile.php" method="get">
+                <button type="submit" name="logout" value="true" class="logout-button">
+                    Log Out
+                </button>
+            </form>
+
             <div>
                 <?php
                 echo "<p><strong>Name:</strong> <span id='name-display'>"
