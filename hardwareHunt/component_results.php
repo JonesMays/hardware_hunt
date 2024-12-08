@@ -1,4 +1,11 @@
 <?php
+// Start the session only if it's not already active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
+<?php
 // Database connection setup
 $host = "webdev.iyaserver.com";
 $userid = "nepo";
