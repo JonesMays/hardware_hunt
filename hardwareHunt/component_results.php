@@ -130,11 +130,11 @@ $offset = ($currentPage - 1) * $productsPerPage;
             background-color: transparent;
             color: white;
             border: 2px solid #a1a1a3;
-            width: 20vw;
+            width: 100%;
             height: 2.75vw;
             border-radius: 20px;
-            padding: 1vw;
-            font-size: 1.2em;
+            padding: 1em;
+            font-size: 1em;
         }
 
         .filter-chevron {
