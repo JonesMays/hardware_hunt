@@ -42,6 +42,32 @@ if($mysql->connect_errno) {
     exit();
 }
 
+//Retrieve Profile Info from database
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $user_id = $_SESSION["user_user_id"] ?? null;
+    $field = $_POST["field"] ?? null;
+    $value = $_POST["value"] ?? null;
+
+    // Validate field and update database
+    $allowed_fields = ["first_name", "last_name", "email", "password"];
+    if ($user_id && $field && in_array($field, $allowed_fields)) {
+        $update_query = "UPDATE users SET $field = ? WHERE user_id = ?";
+        $stmt = $mysql->prepare($update_query);
+        $stmt->bind_param("si", $value, $user_id);
+
+        if ($stmt->execute()) {
+            // Update session variable for immediate reflection
+            $_SESSION["user_" . $field] = $value;
+        } else {
+            echo "Error updating $field.";
+        }
+    }
+
+    // Reload the page using HTML meta refresh
+    echo '<meta http-equiv="refresh" content="0">';
+    exit();
+}
+
 // Get user's projects
 $user_id = $_SESSION['user_id'] ?? null;
 $projects_query = "SELECT * FROM projects WHERE user_id = ? OR user_id IS NULL ORDER BY date DESC LIMIT 5";
@@ -271,24 +297,80 @@ $result = $stmt->get_result();
                 </button>
             </form>
 
-            <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <?php
-                echo "<p><strong>Name:</strong> <span id='name-display'>"
-                . $_SESSION["user_first_name"] . " " . $_SESSION["user_last_name"] .
-                "</span></p>";
+                echo "<p style='flex-grow: 1;'><strong>First Name:</strong> <span id='first_name-display'>"
+                . $_SESSION["user_first_name"] . "</span></p>";
                 ?>
-                <input type="text" id="name-input" class="edit-input" value="<?php echo $_SESSION["user_first_name"]; ?>">
-                <span class="edit-icon" id="edit-name" onclick="editField('name')">&#9998;</span>
-                <button class="save-button" id="save-name" onclick="saveField('name')">Save</button>
+                <form method="post" action="" style="display: flex; align-items: center;">
+                    <span class="edit-icon" id="edit-first_name" onclick="editField('first_name')" 
+                          style="margin-right: 10px; cursor: pointer;">&#9998;</span>
+                    <input type="hidden" name="field" value="first_name">
+                    <input type="text" id="first_name-input" class="edit-input" name="value" 
+                           value="<?php echo $_SESSION["user_first_name"]; ?>" 
+                           style="margin-right: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; display: none;">
+                    <button class="save-button" id="save-first_name" type="submit" 
+                            style="padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">
+                        Save
+                    </button>
+                </form>
             </div>
-            <div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <?php
-                echo "<p><strong>Email:</strong> <span id='email-display'>"
+                echo "<p style='flex-grow: 1;'><strong>Last Name:</strong> <span id='last_name-display'>"
+                . $_SESSION["user_last_name"] . "</span></p>";
+                ?>
+                <form method="post" action="" style="display: flex; align-items: center;">
+                    <span class="edit-icon" id="edit-last_name" onclick="editField('last_name')" 
+                          style="margin-right: 10px; cursor: pointer;">&#9998;</span>
+                    <input type="hidden" name="field" value="last_name">
+                    <input type="text" id="last_name-input" class="edit-input" name="value" 
+                           value="<?php echo $_SESSION["user_last_name"]; ?>" 
+                           style="margin-right: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; display: none;">
+                    <button class="save-button" id="save-last_name" type="submit" 
+                            style="padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">
+                        Save
+                    </button>
+                </form>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <?php
+                echo "<p style='flex-grow: 1;'><strong>Email:</strong> <span id='email-display'>"
                 . $_SESSION["user_email"] . "</span></p>";
                 ?>
-                <input type="text" id="email-input" class="edit-input" value="<?php echo $_SESSION['user_email']; ?>">
-                <span class="edit-icon" id="edit-email" onclick="editField('email')">&#9998;</span>
-                <button class="save-button" id="save-email" onclick="saveField('email')">Save</button>
+                <form method="post" action="" style="display: flex; align-items: center;">
+                    <span class="edit-icon" id="edit-email" onclick="editField('email')" 
+                          style="margin-right: 10px; cursor: pointer;">&#9998;</span>
+                    <input type="hidden" name="field" value="email">
+                    <input type="email" id="email-input" class="edit-input" name="value" 
+                           value="<?php echo $_SESSION["user_email"]; ?>" 
+                           style="margin-right: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; display: none;">
+                    <button class="save-button" id="save-email" type="submit" 
+                            style="padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">
+                        Save
+                    </button>
+                </form>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <?php
+                echo "<p style='flex-grow: 1;'><strong>Password:</strong> <span id='password-display'>"
+                . htmlspecialchars($_SESSION["user_password"]) . "</span></p>";
+                ?>
+                <form method="post" action="" style="display: flex; align-items: center;">
+                    <span class="edit-icon" id="edit-password" onclick="editField('password')" 
+                          style="margin-right: 10px; cursor: pointer;">&#9998;</span>
+                    <input type="hidden" name="field" value="password">
+                    <input type="text" id="password-input" class="edit-input" name="value" 
+                           value="<?php echo htmlspecialchars($_SESSION['user_password'] ?? ''); ?>" 
+                           style="margin-right: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; display: none;">
+                    <button class="save-button" id="save-password" type="submit" 
+                            style="padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">
+                        Save
+                    </button>
+                </form>
             </div>
         </div>
         <div class="projects-section">
