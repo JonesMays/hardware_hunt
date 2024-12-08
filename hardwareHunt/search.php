@@ -259,7 +259,7 @@ if($mysql->connect_errno) { //if error
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
-            gap: 0.5em;
+            gap: 1.5em;
         }
 
         .component-card {
@@ -273,7 +273,8 @@ if($mysql->connect_errno) { //if error
             align-items: center;
             text-align: center;
             flex: 1 1 180px;
-            max-width: 220px;
+            max-width: 300px;
+            margin-bottom: 50px;
         }
 
         .component-card:hover {
@@ -399,7 +400,8 @@ if($mysql->connect_errno) { //if error
 
             <?php
             // Query to fetch 5 random components from the "details" view
-            $query = "SELECT component_id, component_name, component_description, component_type, manufacturer_name, price, component_image  FROM component_details ORDER BY RAND() LIMIT 5";
+            $query = "SELECT component_id, component_name, component_description, component_type, manufacturer_name, price, component_image FROM component_details ORDER BY RAND() LIMIT 5";
+
             $result = $mysql->query($query);
 
             if ($result) {
@@ -452,4 +454,3 @@ function switchTab(type) {
 
 </body>
 </html>
-
