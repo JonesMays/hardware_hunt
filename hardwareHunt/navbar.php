@@ -1,3 +1,10 @@
+<?php
+// Start the session only if it's not already active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <!-- Head section remains the same -->
@@ -110,8 +117,8 @@
         
         <!-- Modified profile icon link -->
         <a href="<?php echo isset($_SESSION['user_user_id']) ? 'profile.php' : 'login.php'; ?>">
-            <img src="user-icon.png" alt="User Icon" class="user-icon">
-        </a>
+    <img src="user-icon.png" alt="User Icon" class="user-icon">
+</a>
     </div>
 </header>
 </body>
