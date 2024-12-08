@@ -1,4 +1,11 @@
 <?php
+// Start the session only if it's not already active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
+<?php
 
 // var_dump output variables ot the screen
 // request contains all submitted form information//
