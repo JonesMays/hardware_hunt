@@ -1,8 +1,10 @@
 <?php
+
 // Start the session only if it's not already active
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 // var_dump output variables ot the screen
 // request contains all submitted form information
 // var_dump($_REQUEST);
@@ -129,8 +131,10 @@ if($mysql->connect_errno) { //if error
 </head>
 <body>
 
-<iframe src="NewPages/navbar.html" style="border: none; width: 100%; height: auto;" id="navbar"></iframe>
-<!-- di i need a form? -->
+<?php
+    $showSearchBar = false;
+    include 'navbar.php';
+?>
 
 <?php
 // Check if a POST request was made
