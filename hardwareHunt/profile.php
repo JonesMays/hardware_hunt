@@ -69,8 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 // Get user's projects
-$user_id = $_SESSION['user_id'] ?? null;
-$projects_query = "SELECT * FROM projects WHERE user_id = ? OR user_id IS NULL ORDER BY date DESC LIMIT 5";
+$user_id = $_SESSION['user_user_id'] ?? null;
+$projects_query = "SELECT * FROM projects WHERE user_id = ? /* OR user_id IS NULL ORDER BY date DESC LIMIT 5*/";
 $stmt = $mysql->prepare($projects_query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -382,7 +382,7 @@ $result = $stmt->get_result();
                         ?>
                         <a href="project_details.php?id=<?php echo htmlspecialchars($project['project_id']); ?>" style="text-decoration: none; color: inherit;">
                             <div class="project-item">
-                                <img src="/api/placeholder/200/150" alt="Project Image">
+<!--                                <img src="/api/placeholder/200/150" alt="Project Image">-->
                                 <div class="project-details">
                                     <div class="project-info">
                                         <h3><?php echo htmlspecialchars($project['project_name']); ?></h3>
@@ -400,7 +400,7 @@ $result = $stmt->get_result();
                 }
                 ?>
             </div>
-            <button class="add-project-button">Add Project</button>
+            <button class="add-project-button" onclick="location.href='addProject.php'">Add Project</button>
         </div>
     </div>
 </main>

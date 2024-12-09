@@ -180,7 +180,7 @@ if(!$results) {
             <?php
             while($currentrow = $results->fetch_assoc()) {
                 ?>
-                <img src="project-placeholder.jpg" alt="Project Image" class="product-image">
+<!--                <img src="project-placeholder.jpg" alt="Project Image" class="product-image">-->
                 <div class="product-info">
                     <div class="product-name"><?php echo htmlspecialchars($currentrow['project_name']); ?></div>
                     <div class="product-description"><?php echo htmlspecialchars($currentrow['project_description']); ?></div>
@@ -199,10 +199,29 @@ if(!$results) {
         <div class="sections-container">
             <div class="components-section">
                 <h2>Required Components</h2>
-                <?php
-                // Query to get components used in this project
-                $sql = "SELECT c.* FROM component_details c 
-                        JOIN `projects-x-components` pc ON c.component_id = pc.component_id 
+<!--                --><?php
+//                $sql = "SELECT c.* FROM component_details c
+//        JOIN `projects-x-components` pc ON c.component_id = pc.component_id
+//        WHERE pc.project_id = " . intval($_REQUEST['id']);
+//
+//                echo "<p>Debug SQL Query: $sql</p>"; // Debug the query
+//
+//                $components_result = $mysql->query($sql);
+//
+//                if (!$components_result) {
+//                    echo "<p>SQL Error: " . $mysql->error . "</p>";
+//                    exit();
+//                }
+//
+//                if ($components_result->num_rows > 0) {
+//                    echo "<p>Found " . $components_result->num_rows . " components.</p>"; // Debug number of components found
+//                } else {
+//                    echo "<p>No components found for this project ID.</p>";
+//                }
+
+                                // Query to get components used in this project
+                $sql = "SELECT c.* FROM component_details c
+                        JOIN `projects-x-components` pc ON c.component_id = pc.component_id
                         WHERE pc.project_id = " . intval($_REQUEST['id']);
                 $components_result = $mysql->query($sql);
 

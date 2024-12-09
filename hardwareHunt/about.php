@@ -92,7 +92,7 @@
         <h1>Meet Our Team!</h1>
         <div class="grid-container">
             <div class="profile-box">
-                <img src="profileImages/amanda.png" alt="Person 1">
+                <img src="profileImages/Amanda%20Promo%20serious%20(edited).jpg" alt="Person 1">
                 <h3>Amanda Nepo</h3>
                 <p>CEO | Developer</p>
             </div>

@@ -88,6 +88,9 @@ if (session_status() === PHP_SESSION_NONE) {
             height: auto;
             cursor: pointer;
         }
+        .user-icon:hover {
+            opacity: 0.7; /* Adjust opacity for hover */
+        }
     </style>
 </head>
 <body>

@@ -509,7 +509,7 @@ if($mysql->connect_errno) { //if error
                     ?>
                     <div class="review">
                         <div class="review-header">
-                            <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
+<!--                            <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">-->
                             <span class="user-name"><?php echo htmlspecialchars($currentrow['first_name']); ?></span> <!-- Display username -->
                             <span class="rating"><?php echo str_repeat('★', $currentrow['rating_value']) . str_repeat('☆', 5 - $currentrow['rating_value']); ?></span>
                         </div>

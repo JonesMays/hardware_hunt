@@ -324,7 +324,7 @@ $sql .= " LIMIT $productsPerPage OFFSET $offset";
                 });
 
                 productElement.innerHTML = `
-                    <img src="${product.imgSrc}" alt="${product.name}">
+<!--                    <img src="${product.imgSrc}" alt="${product.name}">-->
                     <div class="product-details">
                         <div class="product-info">
                             <h3>${product.name}</h3>
