@@ -75,7 +75,7 @@ if(!$results) {
         }
 
         .product-info {
-            width: 60%;
+            width: 100%;
         }
 
         .product-name {
