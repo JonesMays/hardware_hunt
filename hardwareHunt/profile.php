@@ -356,14 +356,13 @@ $result = $stmt->get_result();
             
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <?php
-                echo "<p style='flex-grow: 1;'><strong>Password:</strong> <span id='password-display'>"
-                . htmlspecialchars($_SESSION["user_password"]) . "</span></p>";
+                echo "<p style='flex-grow: 1;'><strong>Password</strong> <span id='password-display'></span></p>";
                 ?>
                 <form method="post" action="" style="display: flex; align-items: center;">
                     <span class="edit-icon" id="edit-password" onclick="editField('password')" 
                           style="margin-right: 10px; cursor: pointer;">&#9998;</span>
                     <input type="hidden" name="field" value="password">
-                    <input type="text" id="password-input" class="edit-input" name="value" 
+                    <input type="password" id="password-input" class="edit-input" name="value" 
                            value="<?php echo htmlspecialchars($_SESSION['user_password'] ?? ''); ?>" 
                            style="margin-right: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; display: none;">
                     <button class="save-button" id="save-password" type="submit" 
