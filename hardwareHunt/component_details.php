@@ -89,78 +89,9 @@ if($mysql->connect_errno) { //if error
     <title>Product Details</title>
     <link rel="stylesheet" href="menu.css">
     <style>
-        /** {*/
-        /*    box-sizing: border-box;*/
-        /*    margin: 0;*/
-        /*    padding: 0;*/
-        /*}*/
+        
 
-        /*body {*/
-        /*    font-family: Arial, sans-serif;*/
-        /*    background-color: #1c1c1e;*/
-        /*    color: #ffffff;*/
-        /*    display: flex;*/
-        /*    flex-direction: column;*/
-        /*    align-items: center;*/
-        /*}*/
-
-        /*header {*/
-        /*    background-color: #2c2c2e;*/
-        /*    color: #fff;*/
-        /*    display: flex;*/
-        /*    justify-content: space-between;*/
-        /*    align-items: center;*/
-        /*    padding: 1.5em 2em;*/
-        /*    width: 100%;*/
-        /*    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);*/
-        /*}*/
-
-        /*.header-left {*/
-        /*    display: flex;*/
-        /*    align-items: center;*/
-        /*    color: #ffaa33;*/
-        /*}*/
-
-        /*.logo {*/
-        /*    width: 40px;*/
-        /*    height: auto;*/
-        /*    margin-right: 0.5em;*/
-        /*}*/
-
-        /*.header-left h1 {*/
-        /*    font-size: 1.5em;*/
-        /*    margin: 0;*/
-        /*}*/
-
-        /*.header-center {*/
-        /*    display: flex;*/
-        /*    gap: 1.5em;*/
-        /*    align-items: center;*/
-        /*}*/
-
-        /*.header-center a {*/
-        /*    color: #fff;*/
-        /*    text-decoration: none;*/
-        /*    font-size: 1em;*/
-        /*}*/
-
-        /*.header-center a:hover {*/
-        /*    text-decoration: underline;*/
-        /*}*/
-
-        .header-right {
-            display: block;
-            align-items: right;
-            text-align: right;
-            gap: 1em;
-            width: 200px;
-        }
-
-        /*.user-icon {*/
-        /*    width: 30px;*/
-        /*    height: auto;*/
-        /*    cursor: pointer;*/
-        /*}*/
+        
 
         .container {
             width: 75%;
@@ -175,8 +106,11 @@ if($mysql->connect_errno) { //if error
         }
 
         .product-image {
-            width: 40%;
+            width: 100%;
             border-radius: 8px;
+        }
+        
+        .image-div {
             margin-right: 30px;
         }
 
@@ -407,7 +341,10 @@ if($mysql->connect_errno) { //if error
 
         while($currentrow = $results->fetch_assoc()) {
             ?>
+            <div class=image-div>
             <img src="<?php echo $currentrow['component_image']; ?>" alt="Product Image" class="product-image">
+            </div>
+            
             <div class="product-info">
                 <div class="product-name"><?php echo $currentrow['component_name']; ?></div>
                 <div class="product-description"><?php echo $currentrow['component_description']; ?></div>
@@ -618,76 +555,7 @@ if($mysql->connect_errno) { //if error
         }
     }
 
-    /*
-    function submitReview() {
-        const rating = document.getElementById('rating').value;
-        const review = document.getElementById('review').value;
-        const componentId = new URLSearchParams(window.location.search).get('id');
-        
-        // Basic validation
-        if (!review.trim()) {
-            alert('Please write a review before submitting.');
-            return;
-        }
-        
-        // Create form data
-        const formData = new FormData();
-        formData.append('action', 'submit_review');
-        formData.append('rating', rating);
-        formData.append('review', review);
-        formData.append('component_id', componentId);
-        
-        // Submit the review
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Create new review element
-                const reviewsSection = document.querySelector('.reviews-section');
-                const newReview = document.createElement('div');
-                newReview.className = 'review';
-                newReview.innerHTML = `
-                    <div class="review-header">
-                        <img src="user-icon-small.png" alt="User Icon" class="user-icon-small">
-                        <span class="user-name">${window.userFirstName || 'You'}</span>
-                        <span class="rating">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>
-                    </div>
-                    <p class="review-text">${review}</p>
-                `;
-                
-                // Insert new review after the h2 title
-                const h2Element = reviewsSection.querySelector('h2');
-                h2Element.insertAdjacentElement('afterend', newReview);
-                
-                // Remove the form and button
-                const reviewForm = document.getElementById('reviewForm');
-                const writeReviewBtn = document.querySelector('.write-review-btn');
-                
-                if (reviewForm) reviewForm.remove();
-                if (writeReviewBtn) writeReviewBtn.remove();
-                
-                // Add thank you message
-                const thankYouMessage = document.createElement('div');
-                thankYouMessage.style.marginTop = '20px';
-                thankYouMessage.style.textAlign = 'center';
-                thankYouMessage.style.color = '#ffaa33';
-                thankYouMessage.textContent = 'Thank you for submitting a review!';
-                
-                // Insert the thank you message where the button was
-                h2Element.insertAdjacentElement('afterend', thankYouMessage);
-                
-            } else {
-                alert(data.message || 'Error submitting review. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error submitting review. Please try again.');
-        });
-    */
+    
 </script>
 
 </body>
