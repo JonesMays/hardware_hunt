@@ -64,11 +64,10 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .header-right {
-            display: flex;           /* Keep this */
-            align-items: center;     /* Keep this */
-            gap: 1em;               /* Keep this */
-            width: 200px;           /* Keep this */
-            /* Remove the display: block and text-align: right */
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1em;
         }
 
         .header-right form {
@@ -88,6 +87,7 @@ if (session_status() === PHP_SESSION_NONE) {
             height: auto;
             cursor: pointer;
         }
+
         .user-icon:hover {
             opacity: 0.7; /* Adjust opacity for hover */
         }
@@ -120,8 +120,8 @@ if (session_status() === PHP_SESSION_NONE) {
         
         <!-- Modified profile icon link -->
         <a href="<?php echo isset($_SESSION['user_user_id']) ? 'profile.php' : 'login.php'; ?>">
-    <img src="user-icon.png" alt="User Icon" class="user-icon">
-</a>
+            <img src="user-icon.png" alt="User Icon" class="user-icon">
+        </a>
     </div>
 </header>
 </body>
