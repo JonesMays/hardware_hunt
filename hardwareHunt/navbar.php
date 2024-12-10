@@ -68,6 +68,7 @@ if (session_status() === PHP_SESSION_NONE) {
             align-items: center;
             justify-content: flex-end;
             gap: 1em;
+            width: 220px;
         }
 
         .header-right form {
