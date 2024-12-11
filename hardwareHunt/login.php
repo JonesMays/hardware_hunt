@@ -158,8 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["user_password"] = $user['password'];
             $_SESSION["user_first_name"] = $user['first_name'];
             $_SESSION["user_last_name"] = $user['last_name'];
-            echo "<script>alert('Logged In');
-                 window.location.href = 'search.php';
+            echo "<script>
+                 window.location.href = 'profile.php';
                 </script>";
         } else {
             echo "<script>alert('Invalid Email or Password');</script>";
@@ -194,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message .= "You have created an account for Hardware Hunt. Have fun making!";
         $response = mail($to, $subject, $message);
 
-        echo "<script>alert('Account created successfully!');</script>";
+        echo "<script>alert('Account created successfully! You will receive a confirmation by email shortly');</script>";
     }
 }
 ?>
