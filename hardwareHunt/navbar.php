@@ -60,7 +60,8 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .header-center a:hover {
-            text-decoration: underline;
+            text-decoration: none;
+            opacity: 0.8;
         }
 
         .header-right {
@@ -90,7 +91,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .user-icon:hover {
-            opacity: 0.7; /* Adjust opacity for hover */
+            opacity: 0.8;
         }
     </style>
 </head>
