@@ -19,6 +19,7 @@ include 'admin_navbar.php';
         <li><a href="table_view.php?table=projects">View Projects</a></li>
         <li><a href="table_view.php?table=reviews">View Reviews</a></li>
         <li><a href="table_view.php?table=users">View Users</a></li>
+        <a href="../search.php">Main Site</a>
     </ul>
 </body>
 </html>
