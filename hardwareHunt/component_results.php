@@ -3,9 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-?>
 
-<?php
 // Database connection setup
 $host = "webdev.iyaserver.com";
 $userid = "nepo";
@@ -18,6 +16,7 @@ $mysql = new mysqli(
     $userpw,
     $db
 );
+
 if (!$mysql->set_charset("utf8")) {
     echo "Error loading character set utf8: " . $mysql->error;
     exit();
@@ -28,20 +27,33 @@ if($mysql->connect_errno) {
     exit();
 }
 
-// Get total number of products for pagination
-$countSql = "SELECT COUNT(*) as total FROM component_details WHERE 1=1";
+// Fetch all products without pagination limits
+$sql = "SELECT * FROM component_details";
 if (isset($_REQUEST['search-parts'])) {
     $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
-    $countSql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
+    $sql .= " WHERE component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%'";
 }
-$countResult = $mysql->query($countSql);
-$totalProducts = $countResult->fetch_assoc()['total'];
 
-// Set pagination variables
-$productsPerPage = 10;
-$totalPages = ceil($totalProducts / $productsPerPage);
-$currentPage = isset($_REQUEST['page']) ? max(1, min($totalPages, intval($_REQUEST['page']))) : 1;
-$offset = ($currentPage - 1) * $productsPerPage;
+$results = $mysql->query($sql);
+if (!$results) {
+    echo "SQL error: ". $mysql->error;
+    exit();
+}
+
+// Initialize products array
+$products = [];
+while ($currentrow = $results->fetch_assoc()) {
+    $products[] = [
+        'id' => mb_convert_encoding($currentrow['component_id'], "UTF-8", mb_detect_encoding($currentrow['component_id'])),
+        'name' => mb_convert_encoding($currentrow['component_name'], "UTF-8", mb_detect_encoding($currentrow['component_name'])),
+        'price' => (float)$currentrow['price'],
+        'imgSrc' => mb_convert_encoding($currentrow['component_image'], "UTF-8", mb_detect_encoding($currentrow['component_image'])),
+        'description' => mb_convert_encoding($currentrow['component_description'], "UTF-8", mb_detect_encoding($currentrow['component_description'])),
+        'stock' => (int)$currentrow['stock_quantity'],
+        'manufacturer' => mb_convert_encoding($currentrow['manufacturer_name'], "UTF-8", mb_detect_encoding($currentrow['manufacturer_name'])),
+        'category' => mb_convert_encoding($currentrow['component_type'], "UTF-8", mb_detect_encoding($currentrow['component_type']))
+    ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -388,153 +400,134 @@ $offset = ($currentPage - 1) * $productsPerPage;
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Get UI elements
-        const productContainer = document.getElementById("product-list");
-        const paginationContainer = document.querySelector('.pagination');
-        const priceRangeInput = document.getElementById("price-range");
-        const priceValueDisplay = document.getElementById("price-value");
-        const manufacturerSelect = document.getElementById('manufacturer-select');
-        const categorySelect = document.getElementById('category-select');
+    // Get UI elements
+    const productContainer = document.getElementById("product-list");
+    const priceRangeInput = document.getElementById("price-range");
+    const priceValueDisplay = document.getElementById("price-value");
+    const manufacturerSelect = document.getElementById('manufacturer-select');
+    const categorySelect = document.getElementById('category-select');
 
-        function inStock(stock) {
-            if (stock > 20) {
-                return '<span style="color: white;">In Stock</span>';
-            } else if (stock < 20 && stock > 0) {
-                return '<span style="color: yellow;">Few Left</span>';
-            } else {
-                return '<span style="color: red;">Out of Stock</span>';
-            }
+    // Pagination settings
+    const productsPerPage = 10;
+    let currentPage = 1;
+
+    // Initialize with PHP data
+    const allProducts = <?php echo json_encode($products, JSON_THROW_ON_ERROR); ?>;
+    let filteredProducts = [...allProducts];
+
+    function inStock(stock) {
+        if (stock > 20) {
+            return '<span style="color: white;">In Stock</span>';
+        } else if (stock < 20 && stock > 0) {
+            return '<span style="color: yellow;">Few Left</span>';
+        } else {
+            return '<span style="color: red;">Out of Stock</span>';
+        }
+    }
+
+    function createPagination(totalPages) {
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = '#';
+            pageLink.className = `page-link ${i === currentPage ? 'active' : ''}`;
+            pageLink.textContent = i;
+            pageLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = i;
+                displayProducts();
+            });
+            paginationContainer.appendChild(pageLink);
         }
 
-        function displayProducts(filteredProducts) {
-            // Clear everything except pagination
-            const tempPagination = paginationContainer.cloneNode(true);
-            productContainer.innerHTML = "";
-            
-            // Add products
-            filteredProducts.forEach(product => {
-                const productElement = document.createElement("div");
-                productElement.className = "product";
-                productElement.addEventListener("click", () => {
-                    const targetUrl = "component_details.php?id=" + encodeURIComponent(product.id);
-                    console.log(`Navigating to: ${targetUrl}`);
-                    window.location.href = targetUrl;
-                });
+        return paginationContainer;
+    }
 
-                productElement.innerHTML = `
-                    <img src="${product.imgSrc}" alt="${product.name}">
-                    <div class="product-details">
-                        <div class="product-info">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                            <p>Category: ${product.category}</p>
-                            <p>Manufacturer: ${product.manufacturer}</p>
-                        </div>
-                        <div class="product-price-stock">
-                            <p class="product-price">$${product.price.toFixed(2)}</p>
-                            <p class="stock-status">${inStock(product.stock)}</p>
-                        </div>
+    function displayProducts() {
+        productContainer.innerHTML = "";
+
+        // Calculate pagination
+        const startIndex = (currentPage - 1) * productsPerPage;
+        const endIndex = startIndex + productsPerPage;
+        const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+        // Display products
+        paginatedProducts.forEach(product => {
+            const productElement = document.createElement("div");
+            productElement.className = "product";
+            productElement.addEventListener("click", () => {
+                window.location.href = "component_details.php?id=" + encodeURIComponent(product.id);
+            });
+
+            productElement.innerHTML = `
+                <img src="${product.imgSrc}" alt="${product.name}">
+                <div class="product-details">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p>Category: ${product.category}</p>
+                        <p>Manufacturer: ${product.manufacturer}</p>
                     </div>
-                `;
-                productContainer.appendChild(productElement);
-            });
-
-            // Add pagination back
-            productContainer.appendChild(tempPagination);
-        }
-
-        function filterProducts() {
-            const maxPrice = parseFloat(priceRangeInput.value);
-            const selectedManufacturer = document.getElementById('manufacturer-select').value;
-            const selectedCategory = document.getElementById('category-select').value;
-            const keyword = document.getElementById("filter-word-field").value.toLowerCase();
-
-            const filteredProducts = products.filter(product => {
-                // Check manufacturer match
-                const manufacturerMatch = !selectedManufacturer || 
-                                       product.manufacturer === selectedManufacturer;
-
-                // Check category match
-                const categoryMatch = !selectedCategory || 
-                                    product.category === selectedCategory;
-
-                // Check price match
-                const priceMatch = product.price <= maxPrice;
-
-                // Check keyword match if there is a keyword
-                const keywordMatch = !keyword || 
-                                   product.name.toLowerCase().includes(keyword) ||
-                                   product.description.toLowerCase().includes(keyword) ||
-                                   product.category.toLowerCase().includes(keyword) ||
-                                   product.manufacturer.toLowerCase().includes(keyword);
-
-                return manufacturerMatch && categoryMatch && priceMatch && keywordMatch;
-            });
-
-            console.log('Filtered products:', filteredProducts);
-            console.log('Applied filters:', {
-                manufacturer: selectedManufacturer,
-                category: selectedCategory,
-                maxPrice: maxPrice,
-                keyword: keyword
-            });
-
-            displayProducts(filteredProducts);
-        }
-
-        // Initialize keyword search function
-        window.KeywordSearch = function() {
-            filterProducts();
-        }
-
-        // PHP products data injection remains here
-        <?php
-        $sql = "SELECT * FROM component_details WHERE 1=1";
-
-        if (isset($_REQUEST['search-parts'])) {
-            $searchTerm = $mysql->real_escape_string($_REQUEST['search-parts']);
-            $sql .= " AND (component_name LIKE '%$searchTerm%' OR component_description LIKE '%$searchTerm%')";
-        }
-
-        $sql .= " LIMIT $productsPerPage OFFSET $offset";
-
-        $results = $mysql->query($sql);
-        if (!$results) {
-            echo "console.error('SQL Error: " . $mysql->error . "');";
-            exit();
-        }
-
-        $products = [];
-        while ($currentrow = $results->fetch_assoc()) {
-            $one = [
-                'id' => mb_convert_encoding($currentrow['component_id'], "UTF-8", mb_detect_encoding($currentrow['component_id'])),
-                'name' => mb_convert_encoding($currentrow['component_name'], "UTF-8", mb_detect_encoding($currentrow['component_name'])),
-                'price' => (float)$currentrow['price'],
-                'imgSrc' => mb_convert_encoding($currentrow['component_image'], "UTF-8", mb_detect_encoding($currentrow['component_image'])),
-                'description' => mb_convert_encoding($currentrow['component_description'], "UTF-8", mb_detect_encoding($currentrow['component_description'])),
-                'stock' => (int)$currentrow['stock_quantity'],
-                'manufacturer' => mb_convert_encoding($currentrow['manufacturer_name'], "UTF-8", mb_detect_encoding($currentrow['manufacturer_name'])),
-                'category' => mb_convert_encoding($currentrow['component_type'], "UTF-8", mb_detect_encoding($currentrow['component_type']))
-            ];
-            $products[] = $one;
-        }
-        $json_data = json_encode($products, JSON_THROW_ON_ERROR);
-        echo "const products = " . $json_data . ";";
-        ?>
-
-        // Initial display
-        displayProducts(products);
-
-        // Event listeners
-        priceRangeInput.addEventListener("input", function(event) {
-            const maxPrice = event.target.value;
-            priceValueDisplay.innerText = maxPrice;
-            filterProducts();
+                    <div class="product-price-stock">
+                        <p class="product-price">$${product.price.toFixed(2)}</p>
+                        <p class="stock-status">${inStock(product.stock)}</p>
+                    </div>
+                </div>
+            `;
+            productContainer.appendChild(productElement);
         });
 
-        manufacturerSelect.addEventListener('change', filterProducts);
-        categorySelect.addEventListener('change', filterProducts);
+        // Add pagination
+        const paginationElement = createPagination(totalPages);
+        productContainer.appendChild(paginationElement);
+    }
+
+    function filterProducts() {
+        const maxPrice = parseFloat(priceRangeInput.value);
+        const selectedManufacturer = manufacturerSelect.value;
+        const selectedCategory = categorySelect.value;
+        const keyword = document.getElementById("filter-word-field").value.toLowerCase();
+
+        filteredProducts = allProducts.filter(product => {
+            const manufacturerMatch = !selectedManufacturer || 
+                                   product.manufacturer === selectedManufacturer;
+            const categoryMatch = !selectedCategory || 
+                                product.category === selectedCategory;
+            const priceMatch = product.price <= maxPrice;
+            const keywordMatch = !keyword || 
+                               product.name.toLowerCase().includes(keyword) ||
+                               product.description.toLowerCase().includes(keyword) ||
+                               product.category.toLowerCase().includes(keyword) ||
+                               product.manufacturer.toLowerCase().includes(keyword);
+
+            return manufacturerMatch && categoryMatch && priceMatch && keywordMatch;
+        });
+
+        // Reset to first page when filtering
+        currentPage = 1;
+        displayProducts();
+    }
+
+    // Initialize keyword search function
+    window.KeywordSearch = function() {
+        filterProducts();
+    }
+
+    // Event listeners
+    priceRangeInput.addEventListener("input", function(event) {
+        priceValueDisplay.innerText = event.target.value;
+        filterProducts();
     });
+
+    manufacturerSelect.addEventListener('change', filterProducts);
+    categorySelect.addEventListener('change', filterProducts);
+
+    // Initial display
+    displayProducts();
+});
 </script>
 </body>
 </html>
