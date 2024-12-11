@@ -251,8 +251,8 @@ if($mysql->connect_errno) { //if error
 
         .featured-components-section h2 {
             color: #ffaa33;
-            font-size: 1.5em;
-            margin-bottom: 1em;
+            font-size: 2em;
+            margin-bottom: 1.5em;
         }
 
         .featured-components {
