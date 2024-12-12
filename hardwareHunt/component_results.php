@@ -83,8 +83,9 @@ while ($currentrow = $results->fetch_assoc()) {
             background-color: #2c2c2e;
             color: #ffffff;
             border-radius: 10px;
-            max-height: 80vh;
+            max-height: 40vh;
             overflow-y: auto;
+            margin-top: 25px;
         }
 
         #filters h2 {
@@ -143,7 +144,7 @@ while ($currentrow = $results->fetch_assoc()) {
             color: white;
             border: 2px solid #a1a1a3;
             width: 100%;
-            height: 2.75vw;
+            height: 3em;
             border-radius: 20px;
             padding: 1em;
             font-size: 1em;
@@ -319,6 +320,9 @@ while ($currentrow = $results->fetch_assoc()) {
         }
     </style>
 </head>
+
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR2ZR10KJX"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-WR2ZR10KJX'); </script>
+
 <body>
 <?php
     $showPartsSearchBar = true;
